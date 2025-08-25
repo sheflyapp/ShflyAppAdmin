@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /
+
+# This is an admin panel - should not be indexed by search engines
