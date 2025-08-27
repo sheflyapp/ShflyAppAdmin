@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +14,7 @@ import {
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const { t } = useTranslation();
   const [stats, setStats] = useState({
@@ -76,6 +78,7 @@ const Dashboard = () => {
       change: '+12%',
       changeType: 'positive',
       color: 'bg-blue-500',
+      link: '/users',
     },
     {
       name: t('dashboard.totalProviders'),
@@ -84,6 +87,7 @@ const Dashboard = () => {
       change: '+8%',
       changeType: 'positive',
       color: 'bg-green-500',
+      link: '/providers',
     },
     {
       name: t('dashboard.totalSeekers'),
@@ -92,6 +96,7 @@ const Dashboard = () => {
       change: '+15%',
       changeType: 'positive',
       color: 'bg-indigo-500',
+      link: '/seekers',
     },
     {
       name: t('dashboard.totalConsultations'),
@@ -100,6 +105,7 @@ const Dashboard = () => {
       change: '+23%',
       changeType: 'positive',
       color: 'bg-purple-500',
+      link: '/consultations',
     },
     {
       name: t('dashboard.totalRevenue'),
@@ -108,6 +114,7 @@ const Dashboard = () => {
       change: '+18%',
       changeType: 'positive',
       color: 'bg-yellow-500',
+      link: '/payments',
     },
     
   ];
@@ -148,11 +155,16 @@ const Dashboard = () => {
       {/* Stats cards */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {statCards.map((stat) => (
-          <div key={stat.name} className={`card transition-all duration-300 hover:scale-105 ${
-            isDarkMode 
-              ? 'bg-gray-800 border-gray-700 shadow-gray-900/50' 
-              : 'bg-white border-gray-200 shadow-gray-200/50'
-          }`}>
+          <div 
+            key={stat.name} 
+            onClick={() => navigate(stat.link)}
+            title={`Click to view ${stat.name.toLowerCase()}`}
+            className={`card transition-all duration-300 hover:scale-105 cursor-pointer ${
+              isDarkMode 
+                ? 'bg-gray-800 border-gray-700 shadow-gray-900/50 hover:bg-gray-700 hover:border-gray-600' 
+                : 'bg-white border-gray-200 shadow-gray-200/50 hover:bg-gray-50 hover:border-gray-300'
+            }`}
+          >
             <div className="flex items-center">
               <div className={`flex-shrink-0 p-3 rounded-md ${stat.color}`}>
                 <stat.icon className="h-6 w-6 text-white" />
@@ -187,6 +199,14 @@ const Dashboard = () => {
                 <span className={`ml-1 transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 }`}>from last month</span>
+              </div>
+              {/* Click indicator */}
+              <div className="mt-2 flex items-center justify-end">
+                <span className={`text-xs font-medium transition-colors duration-300 ${
+                  isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                }`}>
+                  Click to view details →
+                </span>
               </div>
             </div>
           </div>

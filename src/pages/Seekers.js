@@ -911,10 +911,12 @@ const Seekers = () => {
               : 'bg-white border-gray-300 shadow-gray-200/50'
           }`}>
             <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col lg:flex-row justify-between items-center">
+              <div className="mb-2 lg:mb-0">
                 <h3 className={`text-lg font-medium transition-colors duration-300 ${
                   isDarkMode ? 'text-white' : 'text-gray-900'
                 }`}>Add New Seeker</h3>
+                </div>
                 <button
                   onClick={() => setShowAddModal(false)}
                   className={`transition-colors duration-200 ${

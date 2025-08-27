@@ -295,8 +295,8 @@ const Users = () => {
   return (
     <div className="animate-fade-in">
       <div className="mb-6">
-        <div className="flex justify-between items-center">
-          <div>
+        <div className="flex flex-col lg:flex-row justify-between items-center">
+          <div className="mb-2 lg:mb-0">
             <h1
               className={`text-2xl font-bold transition-colors duration-300 ${
                 isDarkMode ? "text-white" : "text-gray-900"
