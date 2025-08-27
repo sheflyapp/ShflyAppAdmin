@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import callAPI from "../services/callAPI";
 import { useTheme } from "../contexts/ThemeContext";
-import {
-  MagnifyingGlassIcon,
-  EyeIcon,
+import { 
+  MagnifyingGlassIcon, 
+  EyeIcon, 
   TrashIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -60,7 +60,7 @@ const Users = () => {
       });
 
       const response = await callAPI.get(`/api/admin/users?${params}`);
-
+      
       if (response.data.success) {
         // Ensure users array exists and is valid
         const usersData = response.data.data?.users || [];
@@ -99,7 +99,7 @@ const Users = () => {
       (filterStatus === "unverified" && !user.isVerified) ||
       (filterStatus === "active" && user.isActive) ||
       (filterStatus === "inactive" && !user.isActive);
-
+    
     return matchesSearch && matchesType && matchesStatus;
   });
 
@@ -114,7 +114,7 @@ const Users = () => {
       const response = await callAPI.put(`/api/admin/users/${userId}/status`, {
         isActive: !user.isActive,
       });
-
+      
       if (response.data.success) {
         setUsers(
           users.map((user) =>
@@ -139,7 +139,7 @@ const Users = () => {
     ) {
       try {
         const response = await callAPI.delete(`/api/admin/users/${userId}`);
-
+        
         if (response.data.success) {
           setUsers(users.filter((user) => user._id !== userId));
           toast.success("User deleted successfully");
@@ -162,11 +162,11 @@ const Users = () => {
         `/api/admin/users/${userData._id}`,
         userData
       );
-
+      
       if (response.data.success) {
         setUsers(
           users.map((user) =>
-            user._id === userData._id ? response.data.data : user
+          user._id === userData._id ? response.data.data : user
           )
         );
         setShowEditModal(false);
@@ -199,7 +199,7 @@ const Users = () => {
   const handleCreateUser = async (userData) => {
     try {
       const response = await callAPI.post("/api/admin/users", userData);
-
+      
       if (response.data.success) {
         setUsers([response.data.data, ...users]);
         setShowAddModal(false);
@@ -270,8 +270,8 @@ const Users = () => {
           provider: "bg-purple-100 text-purple-800",
           admin: "bg-gray-100 text-gray-800",
           unknown: "bg-gray-200 text-gray-600",
-        };
-
+    };
+    
     return (
       <span
         className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
@@ -364,7 +364,7 @@ const Users = () => {
             </div>
           </div>
         </div>
-
+        
         <div
           className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
             isDarkMode
@@ -402,7 +402,7 @@ const Users = () => {
             </div>
           </div>
         </div>
-
+        
         <div
           className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
             isDarkMode
@@ -440,7 +440,7 @@ const Users = () => {
             </div>
           </div>
         </div>
-
+        
         <div
           className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
             isDarkMode
@@ -507,20 +507,20 @@ const Users = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
-                    isDarkMode
+                    isDarkMode 
                       ? "border-gray-600 bg-gray-700 text-white placeholder-gray-400"
                       : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
                   }`}
                 />
               </div>
             </div>
-
+            
             <div className="flex gap-2">
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
                 className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
-                  isDarkMode
+                  isDarkMode 
                     ? "border-gray-600 bg-gray-700 text-white"
                     : "border-gray-300 bg-white text-gray-900"
                 }`}
@@ -530,12 +530,12 @@ const Users = () => {
                 <option value="provider">Providers</option>
                 <option value="admin">Admins</option>
               </select>
-
+              
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
-                  isDarkMode
+                  isDarkMode 
                     ? "border-gray-600 bg-gray-700 text-white"
                     : "border-gray-300 bg-white text-gray-900"
                 }`}
@@ -714,7 +714,7 @@ const Users = () => {
                       >
                         <EyeIcon className="h-5 w-5" />
                       </button>
-
+                      
                       <button
                         onClick={() => handleEditUser(user)}
                         className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
@@ -722,11 +722,11 @@ const Users = () => {
                       >
                         <PencilSquareIcon className="h-5 w-5" />
                       </button>
-
+                      
                       <button
                         onClick={() => handleToggleActive(user._id)}
                         className={`transition-colors duration-200 ${
-                          user.isActive
+                          user.isActive 
                             ? "text-red-600 hover:text-red-800"
                             : "text-green-600 hover:text-green-800"
                         }`}
@@ -740,7 +740,7 @@ const Users = () => {
                           <CheckCircleIcon className="h-5 w-5" />
                         )}
                       </button>
-
+                      
                       <button
                         onClick={() => handleDeleteUser(user._id)}
                         className="text-red-600 hover:text-red-800 transition-colors duration-200"
@@ -788,7 +788,7 @@ const Users = () => {
                   <XCircleIcon className="h-6 w-6" />
                 </button>
               </div>
-
+              
               <div className="space-y-3">
                 <div>
                   <label
@@ -806,7 +806,7 @@ const Users = () => {
                     {selectedUser.fullname}
                   </p>
                 </div>
-
+                
                 <div>
                   <label
                     className={`text-sm font-medium transition-colors duration-300 ${
@@ -823,7 +823,7 @@ const Users = () => {
                     @{selectedUser.username}
                   </p>
                 </div>
-
+                
                 <div>
                   <label
                     className={`text-sm font-medium transition-colors duration-300 ${
@@ -840,7 +840,7 @@ const Users = () => {
                     {selectedUser.email}
                   </p>
                 </div>
-
+                
                 <div>
                   <label
                     className={`text-sm font-medium transition-colors duration-300 ${
@@ -857,7 +857,7 @@ const Users = () => {
                     {selectedUser.userType}
                   </p>
                 </div>
-
+                
                 <div>
                   <label
                     className={`text-sm font-medium transition-colors duration-300 ${
@@ -874,7 +874,7 @@ const Users = () => {
                     {selectedUser.gender}
                   </p>
                 </div>
-
+                
                 <div>
                   <label
                     className={`text-sm font-medium transition-colors duration-300 ${
@@ -891,7 +891,7 @@ const Users = () => {
                     {selectedUser.country}
                   </p>
                 </div>
-
+                
                 {selectedUser.specialization && (
                   <div>
                     <label
@@ -910,7 +910,7 @@ const Users = () => {
                     </p>
                   </div>
                 )}
-
+                
                 {selectedUser.price && (
                   <div>
                     <label
@@ -929,7 +929,7 @@ const Users = () => {
                     </p>
                   </div>
                 )}
-
+                
                 <div>
                   <label
                     className={`text-sm font-medium transition-colors duration-300 ${
@@ -943,7 +943,7 @@ const Users = () => {
                     {getUserTypeBadge(selectedUser.userType)}
                   </div>
                 </div>
-
+                
                 <div>
                   <label
                     className={`text-sm font-medium transition-colors duration-300 ${
@@ -960,7 +960,7 @@ const Users = () => {
                     {new Date(selectedUser.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-
+                
                 <div>
                   <label
                     className={`text-sm font-medium transition-colors duration-300 ${
@@ -997,11 +997,11 @@ const Users = () => {
                   <XCircleIcon className="h-6 w-6" />
                 </button>
               </div>
-
+              
               <form
                 onSubmit={(e) => {
-                  e.preventDefault();
-                  handleUpdateUser(editingUser);
+                e.preventDefault();
+                handleUpdateUser(editingUser);
                 }}
               >
                 <div className="space-y-4">
@@ -1021,7 +1021,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Username
@@ -1038,7 +1038,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Email
@@ -1055,7 +1055,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       User Type
@@ -1075,7 +1075,7 @@ const Users = () => {
                       <option value="admin">Admin</option>
                     </select>
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Country
@@ -1092,7 +1092,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -1113,7 +1113,7 @@ const Users = () => {
                       Verified User
                     </label>
                   </div>
-
+                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -1135,7 +1135,7 @@ const Users = () => {
                     </label>
                   </div>
                 </div>
-
+                
                 <div className="mt-6 flex justify-end space-x-3">
                   <button
                     type="button"
@@ -1173,11 +1173,11 @@ const Users = () => {
                   ×
                 </button>
               </div>
-
+              
               <form
                 onSubmit={(e) => {
-                  e.preventDefault();
-                  handleCreateUser(newUser);
+                e.preventDefault();
+                handleCreateUser(newUser);
                 }}
               >
                 <div className="space-y-4">
@@ -1194,7 +1194,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Username *
@@ -1209,7 +1209,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Email *
@@ -1224,7 +1224,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       User Type *
@@ -1274,7 +1274,7 @@ const Users = () => {
                       placeholder="e.g., +1234567890"
                     />
                   </div>
-
+                  
                   {/* Provider-specific fields */}
                   {newUser.userType === "provider" && (
                     <>
@@ -1296,7 +1296,7 @@ const Users = () => {
                           placeholder="e.g., Mental Health, Life Coaching"
                         />
                       </div>
-
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700">
                           Price per Hour
@@ -1317,7 +1317,7 @@ const Users = () => {
                       </div>
                     </>
                   )}
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Country
@@ -1331,7 +1331,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Gender
@@ -1348,7 +1348,7 @@ const Users = () => {
                       <option value="other">Other</option>
                     </select>
                   </div>
-
+                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Date of Birth
@@ -1362,7 +1362,7 @@ const Users = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
-
+                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -1380,7 +1380,7 @@ const Users = () => {
                       Verified User
                     </label>
                   </div>
-
+                  
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -1399,9 +1399,9 @@ const Users = () => {
                     </label>
                   </div>
                 </div>
-
+                
                 <div className="mt-6 flex justify-end space-x-3">
-                                    <button
+                  <button
                     type="button"
                     onClick={() => {
                       setShowAddModal(false);
@@ -1442,7 +1442,7 @@ const Users = () => {
       {totalPages > 1 && (
         <div
           className={`px-4 py-3 flex items-center justify-between border-t sm:px-6 transition-colors duration-300 ${
-            isDarkMode
+          isDarkMode 
               ? "bg-gray-800 border-gray-700"
               : "bg-white border-gray-200"
           }`}
@@ -1507,7 +1507,7 @@ const Users = () => {
                 >
                   Previous
                 </button>
-
+                
                 {[...Array(totalPages)].map((_, i) => (
                   <button
                     key={i + 1}
@@ -1525,7 +1525,7 @@ const Users = () => {
                     {i + 1}
                   </button>
                 ))}
-
+                
                 <button
                   onClick={() =>
                     setCurrentPage(Math.min(totalPages, currentPage + 1))
