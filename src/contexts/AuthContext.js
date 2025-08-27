@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import callAPI from '../services/callAPI';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -17,15 +17,14 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Set up axios interceptor for token expiration
+  // Set up callAPI interceptor for token expiration
   useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
+    const interceptor = callAPI.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response && error.response.status === 401) {
           // Token expired or invalid
           localStorage.removeItem('adminToken');
-          delete axios.defaults.headers.common['Authorization'];
           setUser(null);
           setIsAuthenticated(false);
         }
@@ -34,7 +33,7 @@ export const AuthProvider = ({ children }) => {
     );
 
     return () => {
-      axios.interceptors.response.eject(interceptor);
+      callAPI.interceptors.response.eject(interceptor);
     };
   }, []);
 
@@ -44,8 +43,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('adminToken');
     console.log('🔍 Token found in localStorage:', token ? 'YES' : 'NO');
     if (token) {
-      console.log('🔑 Token found, setting axios header and checking auth...');
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      console.log('🔑 Token found, checking auth...');
       checkAuthStatus();
     } else {
       console.log('❌ No token found, setting loading to false');
@@ -67,9 +65,8 @@ export const AuthProvider = ({ children }) => {
   const checkAuthStatus = async () => {
     try {
       console.log('🔍 Checking auth status with token...');
-      console.log('🔑 Current axios header:', axios.defaults.headers.common['Authorization']);
       
-      const response = await axios.get('/api/auth/user');
+      const response = await callAPI.get('/api/auth/user');
       console.log('✅ Auth check response:', response.data);
       
       if (response.data && response.data.userType === 'admin') {
@@ -80,7 +77,6 @@ export const AuthProvider = ({ children }) => {
         console.log('❌ User is not admin, removing token');
         // User is not admin, remove token and redirect to login
         localStorage.removeItem('adminToken');
-        delete axios.defaults.headers.common['Authorization'];
         setIsAuthenticated(false);
       }
     } catch (error) {
@@ -99,7 +95,6 @@ export const AuthProvider = ({ children }) => {
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
         console.log('🚫 Removing token due to 401/403 error');
         localStorage.removeItem('adminToken');
-        delete axios.defaults.headers.common['Authorization'];
       }
       setIsAuthenticated(false);
     } finally {
@@ -112,7 +107,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       console.log('🔐 Attempting login with:', { email, password });
       
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await callAPI.post('/api/auth/login', { email, password });
       console.log('✅ Login response received:', response.data);
       
       const { token, user: userData } = response.data;
@@ -125,12 +120,9 @@ export const AuthProvider = ({ children }) => {
       console.log('🔑 Token received:', token);
       console.log('👤 User data received:', userData);
       
-      // Store token and set axios header
+      // Store token
       localStorage.setItem('adminToken', token);
       console.log('💾 Token saved to localStorage');
-      
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      console.log('🔧 Axios header set');
       
       // Set user state
       setUser(userData);
@@ -151,7 +143,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('adminToken');
-    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     setIsAuthenticated(false);
     toast.success('Logged out successfully');
@@ -159,7 +150,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (profileData) => {
     try {
-      const response = await axios.put('/api/users/profile', profileData);
+      const response = await callAPI.put('/api/users/profile', profileData);
       setUser(response.data.user);
       toast.success('Profile updated successfully');
       return response.data;
@@ -172,7 +163,7 @@ export const AuthProvider = ({ children }) => {
 
   const changePassword = async (currentPassword, newPassword) => {
     try {
-      await axios.put('/api/users/password', { currentPassword, newPassword });
+      await callAPI.put('/api/users/password', { currentPassword, newPassword });
       toast.success('Password changed successfully');
       return true;
     } catch (error) {

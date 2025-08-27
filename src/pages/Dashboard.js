@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import {
@@ -34,7 +34,7 @@ const Dashboard = () => {
       setLoading(true);
       
       // Fetch statistics
-      const statsResponse = await axios.get('/api/admin/dashboard/stats');
+      const statsResponse = await callAPI.get('/api/admin/dashboard/stats');
       
       // Extract data from the nested response structure
       if (statsResponse.data.success && statsResponse.data.data) {

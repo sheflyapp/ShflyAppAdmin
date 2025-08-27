@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
 import { 
   MagnifyingGlassIcon, 
@@ -59,7 +59,7 @@ const Seekers = () => {
         ...(filterCountry !== 'all' && { country: filterCountry }),
       });
 
-      const response = await axios.get(`/api/admin/users?${params}`);
+      const response = await callAPI.get(`/api/admin/users?${params}`);
       
       if (response.data.success) {
         setSeekers(response.data.data.users);
@@ -100,7 +100,7 @@ const Seekers = () => {
   const handleToggleActive = async (seekerId) => {
     try {
       const seeker = seekers.find(s => s._id === seekerId);
-      const response = await axios.put(`/api/admin/users/${seekerId}/status`, {
+      const response = await callAPI.put(`/api/admin/users/${seekerId}/status`, {
         isActive: !seeker.isActive
       });
       
@@ -121,7 +121,7 @@ const Seekers = () => {
   const handleDeleteSeeker = async (seekerId) => {
     if (window.confirm('Are you sure you want to delete this seeker? This action cannot be undone.')) {
       try {
-        const response = await axios.delete(`/api/admin/users/${seekerId}`);
+        const response = await callAPI.delete(`/api/admin/users/${seekerId}`);
         
         if (response.data.success) {
           setSeekers(seekers.filter(seeker => seeker._id !== seekerId));
@@ -141,7 +141,7 @@ const Seekers = () => {
 
   const handleUpdateSeeker = async (seekerData) => {
     try {
-      const response = await axios.put(`/api/admin/users/${seekerData._id}`, seekerData);
+      const response = await callAPI.put(`/api/admin/users/${seekerData._id}`, seekerData);
       
       if (response.data.success) {
         setSeekers(seekers.map(seeker => 
@@ -175,7 +175,7 @@ const Seekers = () => {
 
   const handleCreateSeeker = async (seekerData) => {
     try {
-      const response = await axios.post('/api/admin/users', seekerData);
+      const response = await callAPI.post('/api/admin/users', seekerData);
       
       if (response.data.success) {
         setSeekers([response.data.data, ...seekers]);

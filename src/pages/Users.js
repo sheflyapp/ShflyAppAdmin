@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
 import { 
   MagnifyingGlassIcon, 
@@ -56,7 +56,7 @@ const Users = () => {
         ...(filterType !== 'all' && { userType: filterType }),
       });
 
-      const response = await axios.get(`/api/admin/users?${params}`);
+      const response = await callAPI.get(`/api/admin/users?${params}`);
       
       if (response.data.success) {
         setUsers(response.data.data.users);
@@ -94,7 +94,7 @@ const Users = () => {
   const handleToggleActive = async (userId) => {
     try {
       const user = users.find(u => u._id === userId);
-      const response = await axios.put(`/api/admin/users/${userId}/status`, {
+      const response = await callAPI.put(`/api/admin/users/${userId}/status`, {
         isActive: !user.isActive
       });
       
@@ -115,7 +115,7 @@ const Users = () => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
-        const response = await axios.delete(`/api/admin/users/${userId}`);
+        const response = await callAPI.delete(`/api/admin/users/${userId}`);
         
         if (response.data.success) {
           setUsers(users.filter(user => user._id !== userId));
@@ -135,7 +135,7 @@ const Users = () => {
 
   const handleUpdateUser = async (userData) => {
     try {
-      const response = await axios.put(`/api/admin/users/${userData._id}`, userData);
+      const response = await callAPI.put(`/api/admin/users/${userData._id}`, userData);
       
       if (response.data.success) {
         setUsers(users.map(user => 
@@ -170,7 +170,7 @@ const Users = () => {
 
   const handleCreateUser = async (userData) => {
     try {
-      const response = await axios.post('/api/admin/users', userData);
+      const response = await callAPI.post('/api/admin/users', userData);
       
       if (response.data.success) {
         setUsers([response.data.data, ...users]);

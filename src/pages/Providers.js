@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
 import { 
   MagnifyingGlassIcon, 
@@ -61,7 +61,7 @@ const Providers = () => {
         ...(filterStatus !== 'all' && { status: filterStatus }),
       });
 
-      const response = await axios.get(`/api/admin/users?${params}`);
+      const response = await callAPI.get(`/api/admin/users?${params}`);
       
       if (response.data.success) {
         setProviders(response.data.data.users);
@@ -101,7 +101,7 @@ const Providers = () => {
   const handleToggleActive = async (providerId) => {
     try {
       const provider = providers.find(p => p._id === providerId);
-      const response = await axios.put(`/api/admin/users/${providerId}/status`, {
+      const response = await callAPI.put(`/api/admin/users/${providerId}/status`, {
         isActive: !provider.isActive
       });
       
@@ -122,7 +122,7 @@ const Providers = () => {
   const handleDeleteProvider = async (providerId) => {
     if (window.confirm('Are you sure you want to delete this provider? This action cannot be undone.')) {
       try {
-        const response = await axios.delete(`/api/admin/users/${providerId}`);
+        const response = await callAPI.delete(`/api/admin/users/${providerId}`);
         
         if (response.data.success) {
           setProviders(providers.filter(provider => provider._id !== providerId));
@@ -142,7 +142,7 @@ const Providers = () => {
 
   const handleUpdateProvider = async (providerData) => {
     try {
-      const response = await axios.put(`/api/admin/users/${providerData._id}`, providerData);
+      const response = await callAPI.put(`/api/admin/users/${providerData._id}`, providerData);
       
       if (response.data.success) {
         setProviders(providers.map(provider => 
@@ -178,7 +178,7 @@ const Providers = () => {
 
   const handleCreateProvider = async (providerData) => {
     try {
-      const response = await axios.post('/api/admin/users', providerData);
+      const response = await callAPI.post('/api/admin/users', providerData);
       
       if (response.data.success) {
         setProviders([response.data.data, ...providers]);

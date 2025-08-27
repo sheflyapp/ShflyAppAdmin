@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
 import {
   FolderIcon,
@@ -42,7 +42,7 @@ const CategoriesManagement = () => {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/admin/categories');
+      const response = await callAPI.get('/api/admin/categories');
       
       if (response.data.success) {
         setCategories(response.data.data.categories);
@@ -57,7 +57,7 @@ const CategoriesManagement = () => {
 
   const fetchParentCategories = async () => {
     try {
-      const response = await axios.get('/api/admin/categories?parentCategory=null');
+      const response = await callAPI.get('/api/admin/categories?parentCategory=null');
       if (response.data.success) {
         setParentCategories(response.data.data.categories);
       }
@@ -121,9 +121,9 @@ const CategoriesManagement = () => {
       
       let response;
       if (modalType === 'create') {
-        response = await axios.post('/api/admin/categories', submitData);
+        response = await callAPI.post('/api/admin/categories', submitData);
       } else if (modalType === 'edit') {
-        response = await axios.put(`/api/admin/categories/${selectedCategory._id}`, submitData);
+        response = await callAPI.put(`/api/admin/categories/${selectedCategory._id}`, submitData);
       }
 
       if (response.data.success) {
@@ -140,7 +140,7 @@ const CategoriesManagement = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await axios.delete(`/api/admin/categories/${selectedCategory._id}`);
+      const response = await callAPI.delete(`/api/admin/categories/${selectedCategory._id}`);
       
       if (response.data.success) {
         toast.success('Category deleted successfully');
