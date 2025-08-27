@@ -397,14 +397,14 @@ const Layout = () => {
                   <>
                     {/* Invisible bridge to prevent gap */}
                     <div 
-                      className="absolute right-0 top-5 w-64 h-2 bg-transparent"
+                      className="absolute right-0 top-full w-64 h-2 bg-transparent"
                       onMouseEnter={!isMobile ? () => {
                         setIsHoveringDropdown(true);
                         setProfileDropdownOpen(true);
                       } : undefined}
                     />
                                           <div 
-                      className="absolute right-0 top-5 mt-2 w-64 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
+                      className="absolute right-0 top-full mt-2 w-64 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
                       onMouseEnter={!isMobile ? () => {
                         setIsHoveringDropdown(true);
                         setProfileDropdownOpen(true);
