@@ -33,6 +33,10 @@ const CategoriesManagement = () => {
     sortOrder: 0,
   });
   const [parentCategories, setParentCategories] = useState([]);
+  const [viewMode, setViewMode] = useState(() => {
+    // Default to grid view on mobile devices for better mobile experience
+    return window.innerWidth < 768 ? "grid" : "table";
+  }); // "table", "list", "grid"
 
   useEffect(() => {
     fetchCategories();
@@ -469,27 +473,79 @@ const CategoriesManagement = () => {
               </div>
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="parentOnly"
-                checked={showParentOnly}
-                onChange={(e) => setShowParentOnly(e.target.checked)}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-              />
-              <label
-                htmlFor="parentOnly"
-                className={`ml-2 text-sm transition-colors duration-300 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Show parent categories only
-              </label>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="parentOnly"
+                  checked={showParentOnly}
+                  onChange={(e) => setShowParentOnly(e.target.checked)}
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="parentOnly"
+                  className={`ml-2 text-sm transition-colors duration-300 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  Show parent categories only
+                </label>
+              </div>
+
+              {/* View Toggle Buttons */}
+              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 justify-center sm:justify-start">
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "table"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
+                    </svg>
+                    <span>Table</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "list"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    <span>List</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "grid"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span>Grid</span>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Categories Table */}
+        {/* Conditional Views */}
+        {viewMode === "table" && (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead
@@ -657,6 +713,207 @@ const CategoriesManagement = () => {
             </tbody>
           </table>
         </div>
+        )}
+
+        {/* List View */}
+        {viewMode === "list" && (
+          <div className="space-y-3 p-6">
+            {filteredCategories.length === 0 ? (
+              <div className="text-center py-12">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
+                  isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  <FolderIcon className="h-8 w-8" />
+                </div>
+                <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                }`}>No categories found</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {searchTerm || showParentOnly
+                    ? 'Try adjusting your search or filters'
+                    : 'No category records available at the moment'
+                  }
+                </p>
+              </div>
+            ) : (
+              filteredCategories.map((category) => (
+                <div
+                  key={category._id}
+                  className={`p-4 rounded-lg border transition-all duration-300 ${
+                    isDarkMode 
+                      ? "border-gray-700 bg-gray-800 hover:bg-gray-700" 
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div
+                        className={`h-12 w-12 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                          isDarkMode ? "bg-gray-600" : "bg-gray-300"
+                        }`}
+                        style={{ backgroundColor: category.color + '20' }}
+                      >
+                        <FolderIcon
+                          className={`h-6 w-6 transition-colors duration-300`}
+                          style={{ color: category.color }}
+                        />
+                      </div>
+                      <div>
+                        <div className={`text-lg font-medium transition-colors duration-300 ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}>
+                          {category.name}
+                        </div>
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}>
+                          {category.description}
+                        </div>
+                        <div className={`text-xs transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-400" : "text-gray-400"
+                        }`}>
+                          {category.parentCategory ? `Subcategory of ${category.parentCategory.name}` : 'Parent Category'}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <div className="mb-1">{getStatusBadge(category)}</div>
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}>
+                          Sort Order: {category.sortOrder}
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleViewCategory(category)}
+                          className="text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                          title="View Details"
+                        >
+                          <EyeIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleEditCategory(category)}
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                          title="Edit Category"
+                        >
+                          <PencilSquareIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(category)}
+                          className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                          title="Delete Category"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Grid View */}
+        {viewMode === "grid" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+            {filteredCategories.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
+                  isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  <FolderIcon className="h-8 w-8" />
+                </div>
+                <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                }`}>No categories found</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {searchTerm || showParentOnly
+                    ? 'Try adjusting your search or filters'
+                    : 'No category records available at the moment'
+                  }
+                </p>
+              </div>
+            ) : (
+              filteredCategories.map((category) => (
+                <div
+                  key={category._id}
+                  className={`p-4 rounded-lg border transition-all duration-300 ${
+                    isDarkMode 
+                      ? "border-gray-700 bg-gray-800 hover:bg-gray-700" 
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="text-center mb-4">
+                    <div
+                      className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-3 transition-colors duration-300 ${
+                        isDarkMode ? "bg-gray-600" : "bg-gray-300"
+                      }`}
+                      style={{ backgroundColor: category.color + '20' }}
+                    >
+                      <FolderIcon
+                        className={`h-8 w-8 transition-colors duration-300`}
+                        style={{ color: category.color }}
+                      />
+                    </div>
+                    <div className={`text-lg font-medium transition-colors duration-300 ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}>
+                      {category.name}
+                    </div>
+                    <div className={`text-sm transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                      {category.description}
+                    </div>
+                    <div className={`text-xs transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-400"
+                    }`}>
+                      {category.parentCategory ? `Subcategory of ${category.parentCategory.name}` : 'Parent Category'}
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-center">{getStatusBadge(category)}</div>
+                    <div className={`text-center text-sm transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                      Sort Order: {category.sortOrder}
+                    </div>
+                  </div>
+                  <div className="flex justify-center space-x-2">
+                    <button
+                      onClick={() => handleViewCategory(category)}
+                      className="text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                      title="View Details"
+                    >
+                      <EyeIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleEditCategory(category)}
+                      className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                      title="Edit Category"
+                    >
+                      <PencilSquareIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCategory(category)}
+                      className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                      title="Delete Category"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* Modal */}
@@ -1004,15 +1261,15 @@ const CategoriesManagement = () => {
                           ? "border-gray-600 text-gray-300 hover:bg-gray-700"
                           : "border-gray-300 text-gray-700 hover:bg-gray-50"
                       }`}
-                                          >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
-                      >
-                        {modalType === "create" ? "Create" : "Update"} Category
-                      </button>
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
+                    >
+                      {modalType === "create" ? "Create" : "Update"} Category
+                    </button>
                   </div>
                 </form>
               )}

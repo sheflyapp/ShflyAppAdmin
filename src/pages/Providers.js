@@ -47,6 +47,10 @@ const Providers = () => {
     isVerified: false,
     isActive: true
   });
+  const [viewMode, setViewMode] = useState(() => {
+    // Default to grid view on mobile devices for better mobile experience
+    return window.innerWidth < 768 ? "grid" : "table";
+  }); // "table", "list", "grid"
 
   useEffect(() => {
     fetchProviders();
@@ -231,6 +235,31 @@ const Providers = () => {
         isDarkMode ? 'bg-green-900/30 text-green-200' : 'bg-green-100 text-green-800'
       }`}>
         Active
+      </span>
+    );
+  };
+
+  const getUserTypeBadge = (userType) => {
+    const typeConfig = {
+      provider: {
+        label: 'Provider',
+        className: isDarkMode ? 'bg-purple-900/30 text-purple-200' : 'bg-purple-100 text-purple-800'
+      },
+      seeker: {
+        label: 'Seeker',
+        className: isDarkMode ? 'bg-blue-900/30 text-blue-200' : 'bg-blue-100 text-blue-800'
+      },
+      admin: {
+        label: 'Admin',
+        className: isDarkMode ? 'bg-red-900/30 text-red-200' : 'bg-red-100 text-red-800'
+      }
+    };
+
+    const config = typeConfig[userType] || typeConfig.provider;
+    
+    return (
+      <span className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${config.className}`}>
+        {config.label}
       </span>
     );
   };
@@ -420,215 +449,479 @@ const Providers = () => {
               </div>
             </div>
             
-            <div className="flex gap-2">
-              <select
-                value={filterSpecialization}
-                onChange={(e) => setFilterSpecialization(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
-                  isDarkMode 
-                    ? 'border-gray-600 bg-gray-700 text-white' 
-                    : 'border-gray-300 bg-white text-gray-900'
-                }`}
-              >
-                <option value="all">All Specializations</option>
-                {specializations.map(spec => (
-                  <option key={spec} value={spec}>{spec}</option>
-                ))}
-              </select>
-              
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
-                  isDarkMode 
-                    ? 'border-gray-600 bg-gray-700 text-white' 
-                    : 'border-gray-300 bg-white text-gray-900'
-                }`}
-              >
-                <option value="all">All Status</option>
-                <option value="verified">Verified</option>
-                <option value="unverified">Unverified</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-2">
+                <select
+                  value={filterSpecialization}
+                  onChange={(e) => setFilterSpecialization(e.target.value)}
+                  className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                    isDarkMode 
+                      ? 'border-gray-600 bg-gray-700 text-white' 
+                      : 'border-gray-300 bg-white text-gray-900'
+                  }`}
+                >
+                  <option value="all">All Specializations</option>
+                  {specializations.map(spec => (
+                    <option key={spec} value={spec}>{spec}</option>
+                  ))}
+                </select>
+                
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                    isDarkMode 
+                      ? 'border-gray-600 bg-gray-700 text-white' 
+                      : 'border-gray-300 bg-white text-gray-900'
+                  }`}
+                >
+                  <option value="all">All Status</option>
+                  <option value="verified">Verified</option>
+                  <option value="unverified">Unverified</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              {/* View Toggle Buttons */}
+              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 justify-center sm:justify-start">
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "table"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
+                    </svg>
+                    <span>Table</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "list"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    <span>List</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "grid"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span>Grid</span>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Providers Table */}
-        <div className="overflow-x-auto">
-          <table className={`min-w-full divide-y transition-colors duration-300 ${
-            isDarkMode ? 'divide-gray-700' : 'divide-gray-200'
-          }`}>
-            <thead className={`transition-colors duration-300 ${
-              isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+        {/* Conditional Views */}
+        {viewMode === "table" && (
+          <div className="overflow-x-auto">
+            <table className={`min-w-full divide-y transition-colors duration-300 ${
+              isDarkMode ? 'divide-gray-700' : 'divide-gray-200'
             }`}>
-              <tr>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
-                  isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>
-                  Provider
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
-                  isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>
-                  Specialization
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
-                  isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>
-                  Rating
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
-                  isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>
-                  Price
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
-                  isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>
-                  Status
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
-                  isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className={`divide-y transition-colors duration-300 ${
-              isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
-            }`}>
-              {filteredProviders.length === 0 ? (
+              <thead className={`transition-colors duration-300 ${
+                isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+              }`}>
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
-                      }`}>
-                        <UserGroupIcon className="h-8 w-8" />
-                      </div>
-                      <div className="text-center">
-                        <h3 className={`text-lg font-medium transition-colors duration-300 ${
-                          isDarkMode ? 'text-gray-300' : 'text-gray-900'
-                        }`}>No providers found</h3>
-                        <p className={`text-sm transition-colors duration-300 ${
-                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                        }`}>
-                          {searchTerm || filterStatus !== 'all' || filterSpecialization !== 'all'
-                            ? 'Try adjusting your search or filters'
-                            : 'No provider records available at the moment'
-                          }
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-              filteredProviders.map((provider) => (
-                <tr key={provider._id} className={`transition-colors duration-300 ${
-                  isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-                }`}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                        isDarkMode ? 'bg-purple-600' : 'bg-purple-300'
-                      }`}>
-                        <UserIcon className={`h-6 w-6 transition-colors duration-300 ${
-                          isDarkMode ? 'text-white' : 'text-purple-600'
-                        }`} />
-                      </div>
-                      <div className="ml-4">
-                        <div className={`text-sm font-medium transition-colors duration-300 ${
-                          isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>{provider.fullname}</div>
-                        <div className={`text-sm transition-colors duration-300 ${
-                          isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                        }`}>{provider.email}</div>
-                        <div className={`text-xs transition-colors duration-300 ${
-                          isDarkMode ? 'text-gray-400' : 'text-gray-400'
-                        }`}>@{provider.username}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
-                      isDarkMode ? 'bg-blue-900/30 text-blue-200' : 'bg-blue-100 text-blue-800'
-                    }`}>
-                      {provider.specialization}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex items-center mr-2">
-                        {getRatingStars(provider.rating)}
-                      </div>
-                      <span className={`text-sm transition-colors duration-300 ${
-                        isDarkMode ? 'text-white' : 'text-gray-900'
-                      }`}>{provider.rating}</span>
-                      <span className={`text-xs transition-colors duration-300 ${
-                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                      } ml-1`}>({provider.totalReviews})</span>
-                    </div>
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
-                    isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
-                    <div className="flex items-center">
-                      <CurrencyDollarIcon className={`h-4 w-4 transition-colors duration-300 ${
-                        isDarkMode ? 'text-green-400' : 'text-green-600'
-                      } mr-1`} />
-                      {provider.price}/hour
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(provider)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleViewProvider(provider)}
-                        className="text-primary-600 hover:text-primary-800 transition-colors duration-200"
-                        title="View Details"
-                      >
-                        <EyeIcon className="h-5 w-5" />
-                      </button>
-                      
-                      <button
-                        onClick={() => handleEditProvider(provider)}
-                        className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
-                        title="Edit Provider"
-                      >
-                        <PencilSquareIcon className="h-5 w-5" />
-                      </button>
-                      
-                      <button
-                        onClick={() => handleToggleActive(provider._id)}
-                        className={`transition-colors duration-200 ${
-                          provider.isActive 
-                            ? 'text-red-600 hover:text-red-800' 
-                            : 'text-green-600 hover:text-green-800'
-                        }`}
-                        title={provider.isActive ? 'Deactivate Provider' : 'Activate Provider'}
-                      >
-                        {provider.isActive ? <XCircleIcon className="h-5 w-5" /> : <CheckCircleIcon className="h-5 w-5" />}
-                      </button>
-                      
-                      <button
-                        onClick={() => handleDeleteProvider(provider._id)}
-                        className="text-red-600 hover:text-red-800 transition-colors duration-200"
-                        title="Delete Provider"
-                      >
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </td>
+                    Provider
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-500'
+                  }`}>
+                    Specialization
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-500'
+                  }`}>
+                    Rating
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-500'
+                  }`}>
+                    Price
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-500'
+                  }`}>
+                    Status
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-500'
+                  }`}>
+                    Actions
+                  </th>
                 </tr>
+              </thead>
+              <tbody className={`divide-y transition-colors duration-300 ${
+                isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
+              }`}>
+                {filteredProviders.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-3">
+                        <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                          isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                        }`}>
+                          <UserGroupIcon className="h-8 w-8" />
+                        </div>
+                        <div className="text-center">
+                          <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                          }`}>No providers found</h3>
+                          <p className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
+                            {searchTerm || filterStatus !== 'all' || filterSpecialization !== 'all'
+                              ? 'Try adjusting your search or filters'
+                              : 'No provider records available at the moment'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                filteredProviders.map((provider) => (
+                  <tr key={provider._id} className={`transition-colors duration-300 ${
+                    isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                  }`}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                          isDarkMode ? 'bg-purple-600' : 'bg-purple-300'
+                        }`}>
+                          <UserIcon className={`h-6 w-6 transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-purple-600'
+                          }`} />
+                        </div>
+                        <div className="ml-4">
+                          <div className={`text-sm font-medium transition-colors duration-300 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                          }`}>{provider.fullname}</div>
+                          <div className={`text-sm transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                          }`}>{provider.email}</div>
+                          <div className={`text-xs transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-400'
+                          }`}>@{provider.username}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
+                        isDarkMode ? 'bg-blue-900/30 text-blue-200' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {provider.specialization}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex items-center mr-2">
+                          {getRatingStars(provider.rating)}
+                        </div>
+                        <span className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>{provider.rating}</span>
+                        <span className={`text-xs transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        } ml-1`}>({provider.totalReviews})</span>
+                      </div>
+                    </td>
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                    }`}>
+                      <div className="flex items-center">
+                        <CurrencyDollarIcon className={`h-4 w-4 transition-colors duration-300 ${
+                          isDarkMode ? 'text-green-400' : 'text-green-600'
+                        } mr-1`} />
+                        {provider.price}/hour
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getStatusBadge(provider)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleViewProvider(provider)}
+                          className="text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                          title="View Details"
+                        >
+                          <EyeIcon className="h-5 w-5" />
+                        </button>
+                        
+                        <button
+                          onClick={() => handleEditProvider(provider)}
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                          title="Edit Provider"
+                        >
+                          <PencilSquareIcon className="h-5 w-5" />
+                        </button>
+                        
+                        <button
+                          onClick={() => handleToggleActive(provider._id)}
+                          className={`transition-colors duration-200 ${
+                            provider.isActive 
+                              ? 'text-red-600 hover:text-red-800' 
+                              : 'text-green-600 hover:text-green-800'
+                          }`}
+                          title={provider.isActive ? 'Deactivate Provider' : 'Activate Provider'}
+                        >
+                          {provider.isActive ? <XCircleIcon className="h-5 w-5" /> : <CheckCircleIcon className="h-5 w-5" />}
+                        </button>
+                        
+                        <button
+                          onClick={() => handleDeleteProvider(provider._id)}
+                          className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                          title="Delete Provider"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* List View */}
+        {viewMode === "list" && (
+          <div className="space-y-3 p-6">
+            {filteredProviders.length === 0 ? (
+              <div className="text-center py-12">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
+                  isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  <UserGroupIcon className="h-8 w-8" />
+                </div>
+                <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                }`}>No providers found</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {searchTerm || filterStatus !== 'all' || filterSpecialization !== 'all'
+                    ? 'Try adjusting your search or filters'
+                    : 'No provider records available at the moment'
+                  }
+                </p>
+              </div>
+            ) : (
+              filteredProviders.map((provider) => (
+                <div
+                  key={provider._id}
+                  className={`p-4 rounded-lg border transition-all duration-300 ${
+                    isDarkMode 
+                      ? "border-gray-700 bg-gray-800 hover:bg-gray-700" 
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div className="flex items-center space-x-4">
+                      <div
+                        className={`h-12 w-12 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                          isDarkMode ? "bg-gray-600" : "bg-gray-300"
+                        }`}
+                        style={{ backgroundColor: provider.specialization?.color + '20' }}
+                      >
+                        <UserIcon
+                          className={`h-6 w-6 transition-colors duration-300`}
+                          style={{ color: provider.specialization?.color }}
+                        />
+                      </div>
+                      <div>
+                        <div className={`text-lg font-medium transition-colors duration-300 ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}>
+                          {provider.fullname}
+                        </div>
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}>
+                          {provider.specialization?.name || 'No Specialization'}
+                        </div>
+                        <div className={`text-xs transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-400" : "text-gray-400"
+                        }`}>
+                          {provider.country}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                      <div className="text-left sm:text-right">
+                        <div className="mb-1">{getUserTypeBadge(provider.userType)}</div>
+                        <div className="mb-1">{getStatusBadge(provider)}</div>
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}>
+                          Rating: <span className="inline-flex items-center">{getRatingStars(provider.rating)}</span>
+                        </div>
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}>
+                          {provider.consultations?.length || 0} consultations
+                        </div>
+                      </div>
+                      <div className="flex justify-start sm:justify-end space-x-2">
+                        <button
+                          onClick={() => handleViewProvider(provider)}
+                          className="text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                          title="View Details"
+                        >
+                          <EyeIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleEditProvider(provider)}
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                          title="Edit Provider"
+                        >
+                          <PencilSquareIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProvider(provider._id)}
+                          className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                          title="Delete Provider"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))
-              )}
-            </tbody>
-          </table>
-        </div>
+            )}
+          </div>
+        )}
+
+        {/* Grid View */}
+        {viewMode === "grid" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+            {filteredProviders.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
+                  isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  <UserGroupIcon className="h-8 w-8" />
+                </div>
+                <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                }`}>No providers found</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {searchTerm || filterStatus !== 'all' || filterSpecialization !== 'all'
+                    ? 'Try adjusting your search or filters'
+                    : 'No provider records available at the moment'
+                  }
+                </p>
+              </div>
+            ) : (
+              filteredProviders.map((provider) => (
+                <div
+                  key={provider._id}
+                  className={`p-4 rounded-lg border transition-all duration-300 ${
+                    isDarkMode 
+                      ? "border-gray-700 bg-gray-800 hover:bg-gray-700" 
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="text-center mb-4">
+                    <div
+                      className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-3 transition-colors duration-300 ${
+                        isDarkMode ? "bg-gray-600" : "bg-gray-300"
+                      }`}
+                      style={{ backgroundColor: provider.specialization?.color + '20' }}
+                    >
+                      <UserIcon
+                        className={`h-8 w-8 transition-colors duration-300`}
+                        style={{ color: provider.specialization?.color }}
+                      />
+                    </div>
+                    <div className={`text-lg font-medium transition-colors duration-300 ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}>
+                      {provider.fullname}
+                    </div>
+                    <div className={`text-sm transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                      {provider.specialization?.name || 'No Specialization'}
+                    </div>
+                    <div className={`text-xs transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-400"
+                    }`}>
+                      {provider.country}
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-center">{getStatusBadge(provider)}</div>
+                    <div className={`text-center text-sm transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                      Rating: <span className="inline-flex items-center justify-center">{getRatingStars(provider.rating)}</span>
+                    </div>
+                    <div className={`text-center text-sm transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                      ${provider.price}/hour
+                    </div>
+                  </div>
+                  <div className="flex justify-center space-x-2">
+                    <button
+                      onClick={() => handleViewProvider(provider)}
+                      className="text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                      title="View Details"
+                    >
+                      <EyeIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleEditProvider(provider)}
+                      className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                      title="Edit Provider"
+                    >
+                      <PencilSquareIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProvider(provider._id)}
+                      className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                      title="Delete Provider"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* Provider Details Modal */}

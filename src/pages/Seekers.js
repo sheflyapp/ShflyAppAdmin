@@ -31,6 +31,10 @@ const Seekers = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingSeeker, setEditingSeeker] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [viewMode, setViewMode] = useState(() => {
+    // Default to grid view on mobile devices for better mobile experience
+    return window.innerWidth < 768 ? "grid" : "table";
+  }); // "table", "list", "grid"
   const [newSeeker, setNewSeeker] = useState({
     fullname: '',
     username: '',
@@ -260,6 +264,37 @@ const Seekers = () => {
     }).format(amount);
   };
 
+  const getUserTypeBadge = (userType) => {
+    // Safety check for undefined or null userType
+    if (!userType || typeof userType !== "string") {
+      userType = "unknown";
+    }
+
+    const colors = isDarkMode
+      ? {
+          seeker: "bg-blue-900/30 text-blue-200",
+          provider: "bg-purple-900/30 text-purple-200",
+          admin: "bg-gray-700 text-gray-200",
+          unknown: "bg-gray-600 text-gray-200",
+        }
+      : {
+          seeker: "bg-blue-100 text-blue-800",
+          provider: "bg-purple-100 text-purple-800",
+          admin: "bg-gray-100 text-gray-800",
+          unknown: "bg-gray-200 text-gray-600",
+    };
+    
+    return (
+      <span
+        className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
+          colors[userType] || colors.unknown
+        }`}
+      >
+        {userType.charAt(0).toUpperCase() + userType.slice(1)}
+      </span>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -416,42 +451,94 @@ const Seekers = () => {
               </div>
             </div>
             
-            <div className="flex gap-2">
-              <select
-                value={filterCountry}
-                onChange={(e) => setFilterCountry(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
-                  isDarkMode 
-                    ? 'border-gray-600 bg-gray-700 text-white' 
-                    : 'border-gray-300 bg-white text-gray-900'
-                }`}
-              >
-                <option value="all">All Countries</option>
-                {countries.map(country => (
-                  <option key={country} value={country}>{country}</option>
-                ))}
-              </select>
-              
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
-                  isDarkMode 
-                    ? 'border-gray-600 bg-gray-700 text-white' 
-                    : 'border-gray-300 bg-white text-gray-900'
-                }`}
-              >
-                <option value="all">All Status</option>
-                <option value="verified">Verified</option>
-                <option value="unverified">Unverified</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-2">
+                <select
+                  value={filterCountry}
+                  onChange={(e) => setFilterCountry(e.target.value)}
+                  className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                    isDarkMode 
+                      ? 'border-gray-600 bg-gray-700 text-white' 
+                      : 'border-gray-300 bg-white text-gray-900'
+                  }`}
+                >
+                  <option value="all">All Countries</option>
+                  {countries.map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+                
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                    isDarkMode 
+                      ? 'border-gray-600 bg-gray-700 text-white' 
+                      : 'border-gray-300 bg-white text-gray-900'
+                  }`}
+                >
+                  <option value="all">All Status</option>
+                  <option value="verified">Verified</option>
+                  <option value="unverified">Unverified</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              {/* View Toggle Buttons */}
+              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 justify-center sm:justify-start">
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "table"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
+                    </svg>
+                    <span>Table</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "list"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    </svg>
+                    <span>List</span>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setViewMode("grid")}
+                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                    viewMode === "grid"
+                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span>Grid</span>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Seekers Table */}
+        {/* Conditional Views */}
+        {viewMode === "table" && (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className={`transition-colors duration-300 ${
@@ -628,6 +715,253 @@ const Seekers = () => {
             </tbody>
           </table>
         </div>
+        )}
+
+        {/* List View */}
+        {viewMode === "list" && (
+          <div className="space-y-3 p-6">
+            {filteredSeekers.length === 0 ? (
+              <div className="text-center py-12">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
+                  isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  <UserGroupIcon className="h-8 w-8" />
+                </div>
+                <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                }`}>No seekers found</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {searchTerm || filterStatus !== 'all' || filterCountry !== 'all'
+                    ? 'Try adjusting your search or filters'
+                    : 'No seeker records available at the moment'
+                  }
+                </p>
+              </div>
+            ) : (
+              filteredSeekers.map((seeker) => (
+                <div
+                  key={seeker._id}
+                  className={`p-4 rounded-lg border transition-all duration-300 ${
+                    isDarkMode 
+                      ? "border-gray-700 bg-gray-800 hover:bg-gray-700" 
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    <div className="flex items-center space-x-4">
+                      <div
+                        className={`h-12 w-12 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                          isDarkMode ? "bg-gray-600" : "bg-gray-300"
+                        }`}
+                      >
+                        <UserIcon
+                          className={`h-6 w-6 transition-colors duration-300 ${
+                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <div className={`text-lg font-medium transition-colors duration-300 ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}>
+                          {seeker.fullname}
+                        </div>
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}>
+                          {seeker.email}
+                        </div>
+                        <div className={`text-xs transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-400" : "text-gray-400"
+                        }`}>
+                          @{seeker.username}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                      <div className="text-left sm:text-right">
+                        <div className="mb-1">{getUserTypeBadge(seeker.userType)}</div>
+                        <div className="mb-1">{getStatusBadge(seeker)}</div>
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}>
+                          {seeker.country}
+                        </div>
+                        <div className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-500"
+                        }`}>
+                          {calculateAge(seeker.dob)} years
+                        </div>
+                      </div>
+                      <div className="flex justify-start sm:justify-end space-x-2">
+                        <button
+                          onClick={() => handleViewSeeker(seeker)}
+                          className="text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                          title="View Details"
+                        >
+                          <EyeIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleEditSeeker(seeker)}
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                          title="Edit Seeker"
+                        >
+                          <PencilSquareIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleToggleActive(seeker._id)}
+                          className={`transition-colors duration-200 ${
+                            seeker.isActive 
+                              ? "text-red-600 hover:text-red-800"
+                              : "text-green-600 hover:text-green-800"
+                          }`}
+                          title={
+                            seeker.isActive ? "Deactivate Seeker" : "Activate Seeker"
+                          }
+                        >
+                          {seeker.isActive ? (
+                            <XCircleIcon className="h-5 w-5" />
+                          ) : (
+                            <CheckCircleIcon className="h-5 w-5" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteSeeker(seeker._id)}
+                          className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                          title="Delete Seeker"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
+        {/* Grid View */}
+        {viewMode === "grid" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+            {filteredSeekers.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
+                  isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                }`}>
+                  <UserGroupIcon className="h-8 w-8" />
+                </div>
+                <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                }`}>No seekers found</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {searchTerm || filterStatus !== 'all' || filterCountry !== 'all'
+                    ? 'Try adjusting your search or filters'
+                    : 'No seeker records available at the moment'
+                  }
+                </p>
+              </div>
+            ) : (
+              filteredSeekers.map((seeker) => (
+                <div
+                  key={seeker._id}
+                  className={`p-4 rounded-lg border transition-all duration-300 ${
+                    isDarkMode 
+                      ? "border-gray-700 bg-gray-800 hover:bg-gray-700" 
+                      : "border-gray-200 bg-white hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="text-center mb-4">
+                    <div
+                      className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-3 transition-colors duration-300 ${
+                        isDarkMode ? "bg-gray-600" : "bg-gray-300"
+                      }`}
+                    >
+                      <UserIcon
+                        className={`h-8 w-8 transition-colors duration-300 ${
+                          isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
+                      />
+                    </div>
+                    <div className={`text-lg font-medium transition-colors duration-300 ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}>
+                      {seeker.fullname}
+                    </div>
+                    <div className={`text-sm transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                      {seeker.email}
+                    </div>
+                    <div className={`text-xs transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-400"
+                    }`}>
+                      @{seeker.username}
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-center">{getUserTypeBadge(seeker.userType)}</div>
+                    <div className="flex justify-center">{getStatusBadge(seeker)}</div>
+                    <div className={`text-center text-sm transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                      {seeker.country}
+                    </div>
+                    <div className={`text-center text-sm transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                      {calculateAge(seeker.dob)} years
+                    </div>
+                  </div>
+                  <div className="flex justify-center space-x-2">
+                    <button
+                      onClick={() => handleViewSeeker(seeker)}
+                      className="text-primary-600 hover:text-primary-800 transition-colors duration-200"
+                      title="View Details"
+                    >
+                      <EyeIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleEditSeeker(seeker)}
+                      className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                      title="Edit Seeker"
+                    >
+                      <PencilSquareIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleToggleActive(seeker._id)}
+                      className={`transition-colors duration-200 ${
+                        seeker.isActive 
+                          ? "text-red-600 hover:text-red-800"
+                          : "text-green-600 hover:text-green-800"
+                      }`}
+                      title={
+                        seeker.isActive ? "Deactivate Seeker" : "Activate Seeker"
+                      }
+                    >
+                      {seeker.isActive ? (
+                        <XCircleIcon className="h-5 w-5" />
+                      ) : (
+                        <CheckCircleIcon className="h-5 w-5" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteSeeker(seeker._id)}
+                      className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                      title="Delete Seeker"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* Seeker Details Modal */}
