@@ -62,9 +62,13 @@ const Seekers = () => {
       const response = await callAPI.get(`/api/admin/users?${params}`);
       
       if (response.data.success) {
-        setSeekers(response.data.data.users);
-        setTotalPages(response.data.data.pagination.totalPages);
-        setTotalSeekers(response.data.data.pagination.totalUsers);
+        // Ensure seekers array exists and is valid
+        const seekersData = response.data.data?.users || [];
+        const paginationData = response.data.data?.pagination || {};
+        
+        setSeekers(Array.isArray(seekersData) ? seekersData : []);
+        setTotalPages(paginationData.totalPages || 1);
+        setTotalSeekers(paginationData.totalUsers || 0);
       }
     } catch (error) {
       console.error('Error fetching seekers:', error);
@@ -75,9 +79,17 @@ const Seekers = () => {
   };
 
   const filteredSeekers = seekers.filter(seeker => {
-    const matchesSearch = seeker.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         seeker.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         seeker.username.toLowerCase().includes(searchTerm.toLowerCase());
+    // Ensure seeker object exists and has required properties
+    if (!seeker || typeof seeker !== 'object') return false;
+    
+    // Safe search with null checks
+    const fullname = (seeker.fullname || '').toString();
+    const email = (seeker.email || '').toString();
+    const username = (seeker.username || '').toString();
+    
+    const matchesSearch = fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         username.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = filterStatus === 'all' || 
                          (filterStatus === 'verified' && seeker.isVerified) ||
@@ -90,7 +102,7 @@ const Seekers = () => {
     return matchesSearch && matchesStatus && matchesCountry;
   });
 
-  const countries = [...new Set(seekers.filter(s => s.country).map(s => s.country))];
+  const countries = [...new Set(seekers.filter(s => s.country && s.country.trim()).map(s => s.country.trim()))];
 
   const handleViewSeeker = (seeker) => {
     setSelectedSeeker(seeker);

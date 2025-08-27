@@ -2,7 +2,10 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const callAPI = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000',
+  baseURL: process.env.REACT_APP_API_URL || 
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5000' 
+      : 'https://shflyappapi.onrender.com'),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

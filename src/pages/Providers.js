@@ -64,9 +64,13 @@ const Providers = () => {
       const response = await callAPI.get(`/api/admin/users?${params}`);
       
       if (response.data.success) {
-        setProviders(response.data.data.users);
-        setTotalPages(response.data.data.pagination.totalPages);
-        setTotalProviders(response.data.data.pagination.totalUsers);
+        // Ensure providers array exists and is valid
+        const providersData = response.data.data?.users || [];
+        const paginationData = response.data.data?.pagination || {};
+        
+        setProviders(Array.isArray(providersData) ? providersData : []);
+        setTotalPages(paginationData.totalPages || 1);
+        setTotalProviders(paginationData.totalUsers || 0);
       }
     } catch (error) {
       console.error('Error fetching providers:', error);
@@ -77,9 +81,17 @@ const Providers = () => {
   };
 
   const filteredProviders = providers.filter(provider => {
-    const matchesSearch = provider.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         provider.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         provider.specialization.toLowerCase().includes(searchTerm.toLowerCase());
+    // Ensure provider object exists and has required properties
+    if (!provider || typeof provider !== 'object') return false;
+    
+    // Safe search with null checks
+    const fullname = (provider.fullname || '').toString();
+    const email = (provider.email || '').toString();
+    const specialization = (provider.specialization || '').toString();
+    
+    const matchesSearch = fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         specialization.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesSpecialization = filterSpecialization === 'all' || provider.specialization === filterSpecialization;
     const matchesStatus = filterStatus === 'all' || 
@@ -91,7 +103,7 @@ const Providers = () => {
     return matchesSearch && matchesSpecialization && matchesStatus;
   });
 
-  const specializations = [...new Set(providers.map(p => p.specialization))];
+  const specializations = [...new Set(providers.filter(p => p.specialization && p.specialization.trim()).map(p => p.specialization.trim()))];
 
   const handleViewProvider = (provider) => {
     setSelectedProvider(provider);
