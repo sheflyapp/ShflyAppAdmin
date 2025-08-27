@@ -9,9 +9,10 @@ The build was failing due to TypeScript version compatibility issues:
 ## Solution Applied
 
 ### 1. Updated Dependencies
-- **react-scripts**: `5.0.1` → `^6.0.0` (supports TypeScript 5.x)
-- **Added TypeScript**: `^5.0.0` as dev dependency
+- **react-scripts**: Kept at `^5.0.1` (latest stable version)
+- **Added TypeScript**: `^4.9.5` (compatible with react-scripts 5.x)
 - **Added Type Definitions**: `@types/react`, `@types/react-dom`, `@types/node`
+- **Added Resolutions**: Force TypeScript version to avoid conflicts
 
 ### 2. Configuration Files
 - **tsconfig.json**: Added proper TypeScript configuration
@@ -45,14 +46,15 @@ The build should now work automatically with:
 ## What Changed
 
 ### Before (Broken)
-- react-scripts@5.0.1 (old, limited TypeScript support)
+- react-scripts@5.0.1 (limited TypeScript support)
 - No TypeScript configuration
-- Peer dependency conflicts
+- Peer dependency conflicts with TypeScript 5.x
 
 ### After (Fixed)
-- react-scripts@^6.0.0 (modern, TypeScript 5.x support)
+- react-scripts@^5.0.1 (latest stable version)
+- TypeScript 4.9.5 (compatible version)
 - Proper TypeScript configuration
-- Peer dependency resolution
+- Peer dependency resolution with forced versions
 
 ## Troubleshooting
 
@@ -70,7 +72,7 @@ The build should now work automatically with:
 
 ## Benefits
 
-✅ **TypeScript 5.x Support**: Full compatibility with modern TypeScript
+✅ **TypeScript 4.9.5 Support**: Full compatibility with react-scripts 5.x
 ✅ **Modern Build Tools**: Latest react-scripts with better performance
 ✅ **Peer Dependency Resolution**: No more npm install conflicts
 ✅ **Vercel Compatibility**: Should deploy without issues
