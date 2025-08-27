@@ -11,7 +11,8 @@ import {
   ChatBubbleLeftIcon,
   UserIcon,
   PencilSquareIcon,
-  PlusIcon
+  PlusIcon,
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 
@@ -34,7 +35,9 @@ const Seekers = () => {
     fullname: '',
     username: '',
     email: '',
+    password: '',
     userType: 'seeker',
+    phone: '',
     gender: 'other',
     country: '',
     dob: '1990-01-01',
@@ -495,7 +498,33 @@ const Seekers = () => {
             <tbody className={`divide-y transition-colors duration-300 ${
               isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
             }`}>
-              {filteredSeekers.map((seeker) => (
+              {filteredSeekers.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        <UserGroupIcon className="h-8 w-8" />
+                      </div>
+                      <div className="text-center">
+                        <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                        }`}>No seekers found</h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          {searchTerm || filterStatus !== 'all' || filterCountry !== 'all'
+                            ? 'Try adjusting your search or filters'
+                            : 'No seeker records available at the moment'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+              filteredSeekers.map((seeker) => (
                 <tr key={seeker._id} className={`transition-colors duration-300 ${
                   isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                 }`}>
@@ -594,7 +623,8 @@ const Seekers = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>
@@ -933,10 +963,9 @@ const Seekers = () => {
                   <div>
                     <label className={`block text-sm font-medium transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                    }`}>Full Name *</label>
+                    }`}>Full Name</label>
                     <input
                       type="text"
-                      required
                       value={newSeeker.fullname}
                       onChange={(e) => setNewSeeker({...newSeeker, fullname: e.target.value})}
                       className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
@@ -978,6 +1007,42 @@ const Seekers = () => {
                           ? 'border-gray-600 bg-gray-700 text-white' 
                           : 'border-gray-300 bg-white text-gray-900'
                       }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`block text-sm font-medium transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}>Password *</label>
+                    <input
+                      type="password"
+                      required
+                      value={newSeeker.password}
+                      onChange={(e) => setNewSeeker({...newSeeker, password: e.target.value})}
+                      className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                        isDarkMode 
+                          ? 'border-gray-600 bg-gray-700 text-white' 
+                          : 'border-gray-300 bg-white text-gray-900'
+                      }`}
+                      placeholder="Minimum 6 characters"
+                    />
+                  </div>
+
+                  <div>
+                    <label className={`block text-sm font-medium transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}>Phone *</label>
+                    <input
+                      type="tel"
+                      required
+                      value={newSeeker.phone}
+                      onChange={(e) => setNewSeeker({...newSeeker, phone: e.target.value})}
+                      className={`mt-1 block w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                        isDarkMode 
+                          ? 'border-gray-600 bg-gray-700 text-white' 
+                          : 'border-gray-300 bg-white text-gray-900'
+                      }`}
+                      placeholder="e.g., +1234567890"
                     />
                   </div>
                   
@@ -1084,7 +1149,23 @@ const Seekers = () => {
                 <div className="mt-6 flex justify-end space-x-3">
                   <button
                     type="button"
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setNewSeeker({
+                        fullname: '',
+                        username: '',
+                        email: '',
+                        password: '',
+                        userType: 'seeker',
+                        phone: '',
+                        gender: 'other',
+                        country: '',
+                        dob: '1990-01-01',
+                        bio: '',
+                        isVerified: false,
+                        isActive: true
+                      });
+                    }}
                     className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors duration-200 ${
                       isDarkMode 
                         ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 

@@ -10,6 +10,7 @@ import {
   UserIcon,
   PencilSquareIcon,
   PlusIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
 
@@ -32,7 +33,9 @@ const Users = () => {
     fullname: "",
     username: "",
     email: "",
+    password: "",
     userType: "seeker",
+    phone: "",
     country: "",
     gender: "other",
     dob: "1990-01-01",
@@ -611,7 +614,33 @@ const Users = () => {
                   : "bg-white divide-gray-200"
               }`}
             >
-              {filteredUsers.map((user) => (
+              {filteredUsers.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        <UserGroupIcon className="h-8 w-8" />
+                      </div>
+                      <div className="text-center">
+                        <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                        }`}>No users found</h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          {searchTerm || filterType !== 'all' || filterStatus !== 'all'
+                            ? 'Try adjusting your search or filters'
+                            : 'No user records available at the moment'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+              filteredUsers.map((user) => (
                 <tr
                   key={user._id}
                   className={`transition-colors duration-300 ${
@@ -722,7 +751,8 @@ const Users = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>
@@ -1153,11 +1183,10 @@ const Users = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
-                      Full Name *
+                      Full Name
                     </label>
                     <input
                       type="text"
-                      required
                       value={newUser.fullname}
                       onChange={(e) =>
                         setNewUser({ ...newUser, fullname: e.target.value })
@@ -1212,6 +1241,38 @@ const Users = () => {
                       <option value="provider">Provider</option>
                       <option value="admin">Admin</option>
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Password *
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={newUser.password}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, password: e.target.value })
+                      }
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Minimum 6 characters"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Phone *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={newUser.phone}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, phone: e.target.value })
+                      }
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., +1234567890"
+                    />
                   </div>
 
                   {/* Provider-specific fields */}
@@ -1340,9 +1401,26 @@ const Users = () => {
                 </div>
 
                 <div className="mt-6 flex justify-end space-x-3">
-                  <button
+                                    <button
                     type="button"
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setNewUser({
+                        fullname: "",
+                        username: "",
+                        email: "",
+                        password: "",
+                        userType: "seeker",
+                        phone: "",
+                        country: "",
+                        gender: "other",
+                        dob: "1990-01-01",
+                        specialization: "",
+                        price: 0,
+                        isVerified: false,
+                        isActive: true,
+                      });
+                    }}
                     className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     Cancel

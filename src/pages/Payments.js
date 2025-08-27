@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import callAPI from '../services/callAPI';
 import { 
   MagnifyingGlassIcon, 
   EyeIcon, 
@@ -24,128 +25,30 @@ const Payments = () => {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  // Mock data for demonstration
+ // Fetch payments from API
   useEffect(() => {
-    const mockPayments = [
-      {
-        _id: '1',
-        consultationId: 'CONS001',
-        seeker: {
-          _id: '1',
-          fullname: 'John Doe',
-          email: 'john@example.com'
-        },
-        provider: {
-          _id: '1',
-          fullname: 'Dr. Sarah Johnson',
-          email: 'sarah@example.com'
-        },
-        amount: 150.00,
-        currency: 'USD',
-        paymentMethod: 'credit_card',
-        status: 'completed',
-        transactionId: 'TXN_123456789',
-        gateway: 'stripe',
-        fee: 4.65,
-        netAmount: 145.35,
-        description: 'Mental Health Consultation - Video Session',
-        createdAt: '2024-01-20T10:00:00Z',
-        completedAt: '2024-01-20T10:05:00Z',
-        refundedAt: null,
-        refundAmount: 0,
-        failureReason: null
-      },
-      {
-        _id: '2',
-        consultationId: 'CONS002',
-        seeker: {
-          _id: '2',
-          fullname: 'Emma Wilson',
-          email: 'emma@example.com'
-        },
-        provider: {
-          _id: '2',
-          fullname: 'Mike Chen',
-          email: 'mike@example.com'
-        },
-        amount: 120.00,
-        currency: 'USD',
-        paymentMethod: 'bank_transfer',
-        status: 'pending',
-        transactionId: 'TXN_123456790',
-        gateway: 'stripe',
-        fee: 3.20,
-        netAmount: 116.80,
-        description: 'Life Coaching Session - Chat',
-        createdAt: '2024-01-22T14:00:00Z',
-        completedAt: null,
-        refundedAt: null,
-        refundAmount: 0,
-        failureReason: null
-      },
-      {
-        _id: '3',
-        consultationId: 'CONS003',
-        seeker: {
-          _id: '3',
-          fullname: 'Alex Chen',
-          email: 'alex@example.com'
-        },
-        provider: {
-          _id: '3',
-          fullname: 'Anna Rodriguez',
-          email: 'anna@example.com'
-        },
-        amount: 180.00,
-        currency: 'USD',
-        paymentMethod: 'credit_card',
-        status: 'failed',
-        transactionId: 'TXN_123456791',
-        gateway: 'stripe',
-        fee: 0,
-        netAmount: 0,
-        description: 'Relationship Counseling - Phone Call',
-        createdAt: '2024-01-25T16:00:00Z',
-        completedAt: null,
-        refundedAt: null,
-        refundAmount: 0,
-        failureReason: 'Insufficient funds'
-      },
-      {
-        _id: '4',
-        consultationId: 'CONS004',
-        seeker: {
-          _id: '4',
-          fullname: 'Sarah Martinez',
-          email: 'sarah@example.com'
-        },
-        provider: {
-          _id: '1',
-          fullname: 'Dr. Sarah Johnson',
-          email: 'sarah@example.com'
-        },
-        amount: 150.00,
-        currency: 'USD',
-        paymentMethod: 'credit_card',
-        status: 'refunded',
-        transactionId: 'TXN_123456792',
-        gateway: 'stripe',
-        fee: 4.65,
-        netAmount: 145.35,
-        description: 'Mental Health Consultation - Video Session',
-        createdAt: '2024-01-19T13:00:00Z',
-        completedAt: '2024-01-19T13:05:00Z',
-        refundedAt: '2024-01-19T14:00:00Z',
-        refundAmount: 150.00,
-        failureReason: null
-      }
-    ];
+  fetchPayments();
+}, []);
+
+const fetchPayments = async () => {
+  try {
+    setLoading(true);
+    const response = await callAPI.get('/api/admin/payments');
     
-    setTimeout(() => {
-      setPayments(mockPayments);
+    if (response.data.success) {
+      setPayments(response.data.data.payments || []);
+    } else {
+      toast.error('Failed to fetch payments');
+    }
+  } catch (error) {
+    console.error('Error fetching payments:', error);
+    toast.error('Failed to fetch payments');
+    // Set empty array as fallback
+    setPayments([]);
+  } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
+  }
+};
 
   const filteredPayments = payments.filter(payment => {
     const matchesSearch = payment.seeker.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -167,7 +70,9 @@ const Payments = () => {
   const handleRefundPayment = async (paymentId) => {
     if (window.confirm('Are you sure you want to refund this payment?')) {
       try {
-        // API call would go here
+        const response = await callAPI.put(`/api/admin/payments/${paymentId}/refund`);
+        
+        if (response.data.success) {
         setPayments(payments.map(payment => 
           payment._id === paymentId 
             ? { 
@@ -179,7 +84,9 @@ const Payments = () => {
             : payment
         ));
         toast.success('Payment refunded successfully');
+        }
       } catch (error) {
+        console.error('Error refunding payment:', error);
         toast.error('Failed to refund payment');
       }
     }
@@ -188,10 +95,14 @@ const Payments = () => {
   const handleDeletePayment = async (paymentId) => {
     if (window.confirm('Are you sure you want to delete this payment record?')) {
       try {
-        // API call would go here
+        const response = await callAPI.delete(`/api/admin/payments/${paymentId}`);
+        
+        if (response.data.success) {
         setPayments(payments.filter(payment => payment._id !== paymentId));
         toast.success('Payment record deleted successfully');
+        }
       } catch (error) {
+        console.error('Error deleting payment:', error);
         toast.error('Failed to delete payment record');
       }
     }
@@ -306,19 +217,19 @@ const Payments = () => {
   const calculateTotalRevenue = () => {
     return payments
       .filter(p => p.status === 'completed')
-      .reduce((acc, p) => acc + p.netAmount, 0);
+      .reduce((acc, p) => acc + (p.netAmount || 0), 0);
   };
 
   const calculateTotalFees = () => {
     return payments
       .filter(p => p.status === 'completed')
-      .reduce((acc, p) => acc + p.fee, 0);
+      .reduce((acc, p) => acc + (p.fee || 0), 0);
   };
 
   const calculateTotalRefunds = () => {
     return payments
       .filter(p => p.status === 'refunded')
-      .reduce((acc, p) => acc + p.refundAmount, 0);
+      .reduce((acc, p) => acc + (p.refundAmount || 0), 0);
   };
 
   if (loading) {
@@ -557,7 +468,33 @@ const Payments = () => {
             <tbody className={`divide-y transition-colors duration-300 ${
               isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
             }`}>
-              {filteredPayments.map((payment) => (
+              {filteredPayments.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        <CurrencyDollarIcon className="h-8 w-8" />
+                      </div>
+                      <div className="text-center">
+                        <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                        }`}>No payments found</h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          {searchTerm || filterStatus !== 'all' || filterMethod !== 'all' 
+                            ? 'Try adjusting your search or filters'
+                            : 'No payment records available at the moment'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+              filteredPayments.map((payment) => (
                 <tr key={payment._id} className={`transition-colors duration-300 ${
                   isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                 }`}>
@@ -652,7 +589,8 @@ const Payments = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>
@@ -855,4 +793,3 @@ const Payments = () => {
 };
 
 export default Payments;
-

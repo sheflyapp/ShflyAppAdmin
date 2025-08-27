@@ -11,7 +11,8 @@ import {
   CurrencyDollarIcon,
   UserIcon,
   PencilSquareIcon,
-  PlusIcon
+  PlusIcon,
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 
@@ -34,7 +35,9 @@ const Providers = () => {
     fullname: '',
     username: '',
     email: '',
+    password: '',
     userType: 'provider',
+    phone: '',
     specialization: '',
     price: 0,
     country: '',
@@ -353,7 +356,10 @@ const Providers = () => {
               <p className={`text-2xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                {(providers.reduce((acc, p) => acc + p.rating, 0) / providers.length).toFixed(1)}
+                {providers.length > 0 
+                  ? (providers.reduce((acc, p) => acc + (p.rating || 0), 0) / providers.length).toFixed(1)
+                  : '0.0'
+                }
               </p>
             </div>
           </div>
@@ -377,7 +383,10 @@ const Providers = () => {
               <p className={`text-2xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                ${Math.round(providers.reduce((acc, p) => acc + p.price, 0) / providers.length)}
+                ${providers.length > 0 
+                  ? Math.round(providers.reduce((acc, p) => acc + (p.price || 0), 0) / providers.length)
+                  : '0'
+                }
               </p>
             </div>
           </div>
@@ -490,7 +499,33 @@ const Providers = () => {
             <tbody className={`divide-y transition-colors duration-300 ${
               isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
             }`}>
-              {filteredProviders.map((provider) => (
+              {filteredProviders.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        <UserGroupIcon className="h-8 w-8" />
+                      </div>
+                      <div className="text-center">
+                        <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                        }`}>No providers found</h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          {searchTerm || filterStatus !== 'all' || filterSpecialization !== 'all'
+                            ? 'Try adjusting your search or filters'
+                            : 'No provider records available at the moment'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+              filteredProviders.map((provider) => (
                 <tr key={provider._id} className={`transition-colors duration-300 ${
                   isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                 }`}>
@@ -589,7 +624,8 @@ const Providers = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>
@@ -850,10 +886,9 @@ const Providers = () => {
               }}>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Full Name *</label>
+                    <label className="block text-sm font-medium text-gray-700">Full Name</label>
                     <input
                       type="text"
-                      required
                       value={newProvider.fullname}
                       onChange={(e) => setNewProvider({...newProvider, fullname: e.target.value})}
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -881,12 +916,35 @@ const Providers = () => {
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Password *</label>
+                    <input
+                      type="password"
+                      required
+                      value={newProvider.password}
+                      onChange={(e) => setNewProvider({...newProvider, password: e.target.value})}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="Minimum 6 characters"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Phone *</label>
+                    <input
+                      type="tel"
+                      required
+                      value={newProvider.phone}
+                      onChange={(e) => setNewProvider({...newProvider, phone: e.target.value})}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="e.g., +1234567890"
+                    />
+                  </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Specialization *</label>
+                    <label className="block text-sm font-medium text-gray-700">Specialization</label>
                     <input
                       type="text"
-                      required
                       value={newProvider.specialization}
                       onChange={(e) => setNewProvider({...newProvider, specialization: e.target.value})}
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -895,10 +953,9 @@ const Providers = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Price per Hour *</label>
+                    <label className="block text-sm font-medium text-gray-700">Price per Hour</label>
                     <input
                       type="number"
-                      required
                       min="0"
                       step="0.01"
                       value={newProvider.price}
@@ -981,7 +1038,25 @@ const Providers = () => {
                 <div className="mt-6 flex justify-end space-x-3">
                   <button
                     type="button"
-                    onClick={() => setShowAddModal(false)}
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setNewProvider({
+                        fullname: '',
+                        username: '',
+                        email: '',
+                        password: '',
+                        userType: 'provider',
+                        phone: '',
+                        specialization: '',
+                        price: 0,
+                        country: '',
+                        gender: 'other',
+                        dob: '1990-01-01',
+                        bio: '',
+                        isVerified: false,
+                        isActive: true
+                      });
+                    }}
                     className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     Cancel

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import callAPI from '../services/callAPI';
 import { 
   MagnifyingGlassIcon, 
   EyeIcon, 
@@ -8,10 +9,11 @@ import {
   CurrencyDollarIcon,
   CheckCircleIcon,
   XCircleIcon,
-  ChatBubbleLeftIcon,
+  ChatBubbleLeftRightIcon,
   CalendarIcon,
   PhoneIcon,
-  VideoCameraIcon
+  VideoCameraIcon,
+  ChatBubbleLeftIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 
@@ -26,116 +28,31 @@ const Consultations = () => {
   const [selectedConsultation, setSelectedConsultation] = useState(null);
   const [showConsultationModal, setShowConsultationModal] = useState(false);
 
-  // Mock data for demonstration
+  // Fetch consultations from API
   useEffect(() => {
-    const mockConsultations = [
-      {
-        _id: '1',
-        seeker: {
-          _id: '1',
-          fullname: 'John Doe',
-          email: 'john@example.com'
-        },
-        provider: {
-          _id: '1',
-          fullname: 'Dr. Sarah Johnson',
-          email: 'sarah@example.com',
-          specialization: 'Mental Health'
-        },
-        category: 'Mental Health',
-        type: 'video',
-        status: 'completed',
-        price: 150,
-        duration: 60,
-        scheduledAt: '2024-01-20T10:00:00Z',
-        completedAt: '2024-01-20T11:00:00Z',
-        paymentStatus: 'paid',
-        rating: 5,
-        review: 'Excellent session, very helpful insights.',
-        createdAt: '2024-01-18T15:30:00Z'
-      },
-      {
-        _id: '2',
-        seeker: {
-          _id: '2',
-          fullname: 'Emma Wilson',
-          email: 'emma@example.com'
-        },
-        provider: {
-          _id: '2',
-          fullname: 'Mike Chen',
-          email: 'mike@example.com',
-          specialization: 'Life Coaching'
-        },
-        category: 'Life Coaching',
-        type: 'chat',
-        status: 'active',
-        price: 120,
-        duration: 45,
-        scheduledAt: '2024-01-22T14:00:00Z',
-        completedAt: null,
-        paymentStatus: 'paid',
-        rating: null,
-        review: null,
-        createdAt: '2024-01-20T09:15:00Z'
-      },
-      {
-        _id: '3',
-        seeker: {
-          _id: '3',
-          fullname: 'Alex Chen',
-          email: 'alex@example.com'
-        },
-        provider: {
-          _id: '3',
-          fullname: 'Anna Rodriguez',
-          email: 'anna@example.com',
-          specialization: 'Relationship Counseling'
-        },
-        category: 'Relationship Counseling',
-        type: 'call',
-        status: 'scheduled',
-        price: 180,
-        duration: 90,
-        scheduledAt: '2024-01-25T16:00:00Z',
-        completedAt: null,
-        paymentStatus: 'pending',
-        rating: null,
-        review: null,
-        createdAt: '2024-01-22T11:45:00Z'
-      },
-      {
-        _id: '4',
-        seeker: {
-          _id: '4',
-          fullname: 'Sarah Martinez',
-          email: 'sarah@example.com'
-        },
-        provider: {
-          _id: '1',
-          fullname: 'Dr. Sarah Johnson',
-          email: 'sarah@example.com',
-          specialization: 'Mental Health'
-        },
-        category: 'Mental Health',
-        type: 'video',
-        status: 'cancelled',
-        price: 150,
-        duration: 60,
-        scheduledAt: '2024-01-19T13:00:00Z',
-        completedAt: null,
-        paymentStatus: 'refunded',
-        rating: null,
-        review: null,
-        createdAt: '2024-01-17T14:20:00Z'
-      }
-    ];
-    
-    setTimeout(() => {
-      setConsultations(mockConsultations);
-      setLoading(false);
-    }, 1000);
+    fetchConsultations();
   }, []);
+
+  const fetchConsultations = async () => {
+    try {
+      setLoading(true);
+      const response = await callAPI.get('/api/admin/consultations');
+      
+      if (response.data.success) {
+        setConsultations(response.data.data.consultations || []);
+      } else {
+        toast.error('Failed to fetch consultations');
+      }
+    } catch (error) {
+      console.error('Error fetching consultations:', error);
+      toast.error('Failed to fetch consultations');
+      // Set empty array as fallback
+      setConsultations([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const filteredConsultations = consultations.filter(consultation => {
     const matchesSearch = consultation.seeker.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -158,14 +75,20 @@ const Consultations = () => {
 
   const handleUpdateStatus = async (consultationId, newStatus) => {
     try {
-      // API call would go here
+      const response = await callAPI.put(`/api/admin/consultations/${consultationId}/status`, {
+        status: newStatus
+      });
+      
+      if (response.data.success) {
       setConsultations(consultations.map(consultation => 
         consultation._id === consultationId 
           ? { ...consultation, status: newStatus }
           : consultation
       ));
       toast.success(`Consultation status updated to ${newStatus}`);
+      }
     } catch (error) {
+      console.error('Error updating consultation status:', error);
       toast.error('Failed to update consultation status');
     }
   };
@@ -173,10 +96,14 @@ const Consultations = () => {
   const handleDeleteConsultation = async (consultationId) => {
     if (window.confirm('Are you sure you want to delete this consultation?')) {
       try {
-        // API call would go here
+        const response = await callAPI.delete(`/api/admin/consultations/${consultationId}`);
+        
+        if (response.data.success) {
         setConsultations(consultations.filter(consultation => consultation._id !== consultationId));
         toast.success('Consultation deleted successfully');
+        }
       } catch (error) {
+        console.error('Error deleting consultation:', error);
         toast.error('Failed to delete consultation');
       }
     }
@@ -396,7 +323,13 @@ const Consultations = () => {
               <p className={`text-2xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                {formatCurrency(consultations.filter(c => c.paymentStatus === 'paid').reduce((acc, c) => acc + c.price, 0))}
+                {(() => {
+                  const paidConsultations = consultations.filter(c => c.paymentStatus === 'paid');
+                  const totalRevenue = paidConsultations.length > 0 
+                    ? paidConsultations.reduce((acc, c) => acc + (c.price || 0), 0)
+                    : 0;
+                  return formatCurrency(totalRevenue);
+                })()}
               </p>
             </div>
           </div>
@@ -552,7 +485,33 @@ const Consultations = () => {
             <tbody className={`divide-y transition-colors duration-300 ${
               isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
             }`}>
-              {filteredConsultations.map((consultation) => (
+              {filteredConsultations.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center space-y-3">
+                      <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        <ChatBubbleLeftRightIcon className="h-8 w-8" />
+                      </div>
+                      <div className="text-center">
+                        <h3 className={`text-lg font-medium transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                        }`}>No consultations found</h3>
+                        <p className={`text-sm transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          {searchTerm || filterStatus !== 'all' || filterType !== 'all' || filterCategory !== 'all'
+                            ? 'Try adjusting your search or filters'
+                            : 'No consultation records available at the moment'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+              filteredConsultations.map((consultation) => (
                 <tr key={consultation._id} className={`transition-colors duration-300 ${
                   isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                 }`}>
@@ -646,7 +605,8 @@ const Consultations = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>

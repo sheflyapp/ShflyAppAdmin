@@ -10,6 +10,7 @@ import {
   CreditCardIcon,
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
+  Squares2X2Icon,
 } from '@heroicons/react/24/outline';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
@@ -21,6 +22,7 @@ const Dashboard = () => {
     totalUsers: 0,
     totalProviders: 0,
     totalSeekers: 0,
+    totalCategories: 0,
     totalConsultations: 0,
     totalRevenue: 0,
   });
@@ -45,6 +47,7 @@ const Dashboard = () => {
           totalUsers: overview?.totalUsers || 0,
           totalProviders: overview?.totalProviders || 0,
           totalSeekers: overview?.totalSeekers || 0,
+          totalCategories: overview?.totalCategories || 0,
           totalConsultations: overview?.totalConsultations || 0,
           totalRevenue: overview?.totalRevenue || 0,
         });
@@ -62,6 +65,7 @@ const Dashboard = () => {
         totalUsers: 0,
         totalProviders: 0,
         totalSeekers: 0,
+        totalCategories: 0,
         totalConsultations: 0,
         totalRevenue: 0,
       });
@@ -71,6 +75,7 @@ const Dashboard = () => {
   };
 
   const statCards = [
+    // Row 1: Users, Providers, Seekers
     {
       name: t('dashboard.totalUsers'),
       value: stats.totalUsers || 0,
@@ -98,6 +103,16 @@ const Dashboard = () => {
       color: 'bg-indigo-500',
       link: '/seekers',
     },
+    // Row 2: Categories, Consultations, Payments
+    {
+      name: t('dashboard.totalCategories'),
+      value: stats.totalCategories || 0,
+      icon: Squares2X2Icon,
+      change: '+5%',
+      changeType: 'positive',
+      color: 'bg-orange-500',
+      link: '/categories',
+    },
     {
       name: t('dashboard.totalConsultations'),
       value: stats.totalConsultations || 0,
@@ -116,7 +131,6 @@ const Dashboard = () => {
       color: 'bg-yellow-500',
       link: '/payments',
     },
-    
   ];
 
   const chartData = [
@@ -153,7 +167,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((stat) => (
           <div 
             key={stat.name} 

@@ -814,7 +814,7 @@ const CategoriesManagement = () => {
                           isDarkMode ? "text-gray-300" : "text-gray-700"
                         }`}
                       >
-                        Name
+                        Name *
                       </label>
                       <input
                         type="text"
@@ -840,7 +840,6 @@ const CategoriesManagement = () => {
                         Description
                       </label>
                       <textarea
-                        required
                         value={formData.description}
                         onChange={(e) =>
                           setFormData({
@@ -987,21 +986,33 @@ const CategoriesManagement = () => {
                   <div className="mt-6 flex justify-end space-x-3">
                     <button
                       type="button"
-                      onClick={() => setShowModal(false)}
+                      onClick={() => {
+                        setShowModal(false);
+                        setFormData({
+                          name: "",
+                          description: "",
+                          parentCategory: "",
+                          icon: "default-icon",
+                          color: "#3B82F6",
+                          isActive: true,
+                          featured: false,
+                          sortOrder: 0,
+                        });
+                      }}
                       className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors duration-200 ${
                         isDarkMode
                           ? "border-gray-600 text-gray-300 hover:bg-gray-700"
                           : "border-gray-300 text-gray-700 hover:bg-gray-50"
                       }`}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
-                    >
-                      {modalType === "create" ? "Create" : "Update"} Category
-                    </button>
+                                          >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
+                      >
+                        {modalType === "create" ? "Create" : "Update"} Category
+                      </button>
                   </div>
                 </form>
               )}
