@@ -23,6 +23,7 @@ const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isHoveringDropdown, setIsHoveringDropdown] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { user, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
@@ -56,6 +57,7 @@ const Layout = () => {
 
   const closeProfileDropdown = () => {
     setProfileDropdownOpen(false);
+    setIsHoveringDropdown(false);
   };
 
   const profileDropdownRef = useRef(null);
@@ -64,6 +66,7 @@ const Layout = () => {
     const handleClickOutside = (event) => {
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
         setProfileDropdownOpen(false);
+        setIsHoveringDropdown(false);
       }
     };
 
@@ -74,11 +77,20 @@ const Layout = () => {
     // Set initial mobile state
     handleResize();
 
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setProfileDropdownOpen(false);
+        setIsHoveringDropdown(false);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
     window.addEventListener('resize', handleResize);
     
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
       window.removeEventListener('resize', handleResize);
     };
   }, []);
@@ -360,8 +372,19 @@ const Layout = () => {
               <div className="relative" ref={profileDropdownRef}>
                 <button
                   onClick={isMobile ? toggleProfileDropdown : undefined}
-                  onMouseEnter={!isMobile ? () => setProfileDropdownOpen(true) : undefined}
-                  onMouseLeave={!isMobile ? () => setProfileDropdownOpen(false) : undefined}
+                  onMouseEnter={!isMobile ? () => {
+                    setProfileDropdownOpen(true);
+                    setIsHoveringDropdown(true);
+                  } : undefined}
+                  onMouseLeave={!isMobile ? () => {
+                    setIsHoveringDropdown(false);
+                    // Delay closing to allow moving to dropdown
+                    setTimeout(() => {
+                      if (!isHoveringDropdown) {
+                        setProfileDropdownOpen(false);
+                      }
+                    }, 150);
+                  } : undefined}
                   className="flex items-center gap-x-3 p-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <UserCircleIcon className={`h-8 w-8 transition-colors duration-200 ${
@@ -371,11 +394,30 @@ const Layout = () => {
 
                 {/* Profile Dropdown */}
                 {profileDropdownOpen && (
-                  <div 
-                    className="absolute right-0 top-full mt-2 w-64 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
-                    onMouseEnter={!isMobile ? () => setProfileDropdownOpen(true) : undefined}
-                    onMouseLeave={!isMobile ? () => setProfileDropdownOpen(false) : undefined}
-                  >
+                  <>
+                    {/* Invisible bridge to prevent gap */}
+                    <div 
+                      className="absolute right-0 top-0 w-64 h-2 bg-transparent"
+                      onMouseEnter={!isMobile ? () => {
+                        setIsHoveringDropdown(true);
+                        setProfileDropdownOpen(true);
+                      } : undefined}
+                    />
+                                          <div 
+                      className="absolute right-0 top-0 mt-2 w-64 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50"
+                      onMouseEnter={!isMobile ? () => {
+                        setIsHoveringDropdown(true);
+                        setProfileDropdownOpen(true);
+                      } : undefined}
+                      onMouseLeave={!isMobile ? () => {
+                        setIsHoveringDropdown(false);
+                        setTimeout(() => {
+                          if (!isHoveringDropdown) {
+                            setProfileDropdownOpen(false);
+                          }
+                        }, 150);
+                      } : undefined}
+                    >
                     <div className="py-1">
                       {/* User Info Header */}
                       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -420,6 +462,7 @@ const Layout = () => {
                       </button>
                     </div>
                   </div>
+                  </>
                 )}
               </div>
 
