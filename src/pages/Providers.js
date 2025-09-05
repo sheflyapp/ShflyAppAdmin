@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
+import SpecializationSelector from '../components/SpecializationSelector';
 import { 
   MagnifyingGlassIcon, 
   EyeIcon, 
@@ -38,7 +39,7 @@ const Providers = () => {
     password: '',
     userType: 'provider',
     phone: '',
-    specialization: '',
+    specializations: [],
     price: 0,
     country: '',
     gender: 'other',
@@ -52,11 +53,7 @@ const Providers = () => {
     return window.innerWidth < 768 ? "grid" : "table";
   }); // "table", "list", "grid"
 
-  useEffect(() => {
-    fetchProviders();
-  }, [currentPage, searchTerm, filterSpecialization, filterStatus]);
-
-  const fetchProviders = async () => {
+  const fetchProviders = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
@@ -85,7 +82,11 @@ const Providers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, filterSpecialization, filterStatus]);
+
+  useEffect(() => {
+    fetchProviders();
+  }, [fetchProviders]);
 
   const filteredProviders = providers.filter(provider => {
     // Ensure provider object exists and has required properties
@@ -197,17 +198,39 @@ const Providers = () => {
 
   const handleCreateProvider = async (providerData) => {
     try {
-      const response = await callAPI.post('/api/admin/users', providerData);
+      // Prepare provider data with specializations
+      const providerPayload = {
+        ...providerData,
+        specializations: providerData.specializations.map(spec => spec._id)
+      };
+
+      const response = await callAPI.post('/api/admin/users', providerPayload);
       
       if (response.data.success) {
-        setProviders([response.data.data, ...providers]);
+        setProviders([response.data.data.user, ...providers]);
         setShowAddModal(false);
+        setNewProvider({
+          fullname: '',
+          username: '',
+          email: '',
+          password: '',
+          userType: 'provider',
+          phone: '',
+          specializations: [],
+          price: 0,
+          country: '',
+          gender: 'other',
+          dob: '1990-01-01',
+          bio: '',
+          isVerified: false,
+          isActive: true
+        });
         toast.success('Provider created successfully');
         fetchProviders(); // Refresh the list
       }
     } catch (error) {
       console.error('Error creating provider:', error);
-      toast.error('Failed to create provider');
+      toast.error(error.response?.data?.message || 'Failed to create provider');
     }
   };
 
@@ -237,6 +260,13 @@ const Providers = () => {
         Active
       </span>
     );
+  };
+
+  const formatSpecializations = (specializations) => {
+    if (!specializations || specializations.length === 0) {
+      return 'No specializations';
+    }
+    return specializations.map(spec => spec.name || spec).join(', ');
   };
 
   const getUserTypeBadge = (userType) => {
@@ -771,7 +801,7 @@ const Providers = () => {
                         <div className={`text-xs transition-colors duration-300 ${
                           isDarkMode ? "text-gray-400" : "text-gray-400"
                         }`}>
-                          {provider.country}
+                          {formatSpecializations(provider.specializations)}
                         </div>
                       </div>
                     </div>
@@ -878,7 +908,7 @@ const Providers = () => {
                     <div className={`text-xs transition-colors duration-300 ${
                       isDarkMode ? "text-gray-400" : "text-gray-400"
                     }`}>
-                      {provider.country}
+                      {formatSpecializations(provider.specializations)}
                     </div>
                   </div>
                   <div className="space-y-2 mb-4">
@@ -980,8 +1010,8 @@ const Providers = () => {
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Country</label>
-                  <p className="text-sm text-gray-900">{selectedProvider.country}</p>
+                  <label className="text-sm font-medium text-gray-700">Specializations</label>
+                  <p className="text-sm text-gray-900">{formatSpecializations(selectedProvider.specializations)}</p>
                 </div>
                 
                 <div>
@@ -1234,16 +1264,15 @@ const Providers = () => {
                     />
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Specialization</label>
-                    <input
-                      type="text"
-                      value={newProvider.specialization}
-                      onChange={(e) => setNewProvider({...newProvider, specialization: e.target.value})}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="e.g., Mental Health, Life Coaching"
-                    />
-                  </div>
+                  {/* Specializations - Required for providers */}
+                  <SpecializationSelector
+                    selectedSpecializations={newProvider.specializations}
+                    onSpecializationsChange={(specializations) =>
+                      setNewProvider({ ...newProvider, specializations })
+                    }
+                    required={true}
+                    userType="provider"
+                  />
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Price per Hour</label>

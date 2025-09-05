@@ -9,6 +9,7 @@ import Seekers from './pages/Seekers';
 import Consultations from './pages/Consultations';
 import Categories from './pages/Categories';
 import Payments from './pages/Payments';
+import Questions from './pages/Questions';
 import Login from './pages/Login';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -54,6 +55,7 @@ const AppRoutes = () => {
         <Route path="consultations" element={<Consultations />} />
         <Route path="categories" element={<Categories />} />
         <Route path="payments" element={<Payments />} />
+        <Route path="questions" element={<Questions />} />
       </Route>
     </Routes>
   );

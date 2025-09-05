@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import callAPI from "../services/callAPI";
 import { useTheme } from "../contexts/ThemeContext";
+import SpecializationSelector from "../components/SpecializationSelector";
 import { 
   MagnifyingGlassIcon, 
   EyeIcon, 
@@ -43,7 +44,7 @@ const Users = () => {
     country: "",
     gender: "other",
     dob: "1990-01-01",
-    specialization: "",
+    specializations: [],
     price: 0,
     isVerified: false,
     isActive: true,
@@ -202,17 +203,38 @@ const Users = () => {
 
   const handleCreateUser = async (userData) => {
     try {
-      const response = await callAPI.post("/api/admin/users", userData);
+      // Prepare user data with specializations
+      const userPayload = {
+        ...userData,
+        specializations: userData.specializations.map(spec => spec._id)
+      };
+
+      const response = await callAPI.post("/api/admin/users", userPayload);
       
       if (response.data.success) {
-        setUsers([response.data.data, ...users]);
+        setUsers([response.data.data.user, ...users]);
         setShowAddModal(false);
+        setNewUser({
+          fullname: "",
+          username: "",
+          email: "",
+          password: "",
+          userType: "seeker",
+          phone: "",
+          country: "",
+          gender: "other",
+          dob: "1990-01-01",
+          specializations: [],
+          price: 0,
+          isVerified: false,
+          isActive: true,
+        });
         toast.success("User created successfully");
         fetchUsers(); // Refresh the list
       }
     } catch (error) {
       console.error("Error creating user:", error);
-      toast.error("Failed to create user");
+      toast.error(error.response?.data?.message || "Failed to create user");
     }
   };
 
@@ -254,6 +276,13 @@ const Users = () => {
         Active
       </span>
     );
+  };
+
+  const formatSpecializations = (specializations) => {
+    if (!specializations || specializations.length === 0) {
+      return 'No specializations';
+    }
+    return specializations.map(spec => spec.name || spec).join(', ');
   };
 
   const getUserTypeBadge = (userType) => {
@@ -649,7 +678,7 @@ const Users = () => {
                       isDarkMode ? "text-gray-200" : "text-gray-500"
                     }`}
                   >
-                  Country
+                  Specializations
                 </th>
                   <th
                     className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
@@ -752,11 +781,13 @@ const Users = () => {
                     {getStatusBadge(user)}
                   </td>
                     <td
-                      className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
+                      className={`px-6 py-4 text-sm transition-colors duration-300 ${
                         isDarkMode ? "text-gray-200" : "text-gray-900"
                       }`}
                     >
-                    {user.country}
+                    <div className="max-w-xs truncate" title={formatSpecializations(user.specializations)}>
+                      {formatSpecializations(user.specializations)}
+                    </div>
                   </td>
                     <td
                       className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
@@ -888,7 +919,7 @@ const Users = () => {
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
                         }`}>
-                          {user.country}
+                          {formatSpecializations(user.specializations)}
                         </div>
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
@@ -1010,7 +1041,7 @@ const Users = () => {
                     <div className={`text-center text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
-                      {user.country}
+                      {formatSpecializations(user.specializations)}
                     </div>
                     <div className={`text-center text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
@@ -1188,14 +1219,14 @@ const Users = () => {
                       isDarkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
-                    Country
+                    Specializations
                   </label>
                   <p
                     className={`text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    {selectedUser.country}
+                    {formatSpecializations(selectedUser.specializations)}
                   </p>
                 </div>
                 
@@ -1582,47 +1613,38 @@ const Users = () => {
                     />
                   </div>
                   
+                  {/* Specializations - Required for all user types except admin */}
+                  {newUser.userType !== "admin" && (
+                    <SpecializationSelector
+                      selectedSpecializations={newUser.specializations}
+                      onSpecializationsChange={(specializations) =>
+                        setNewUser({ ...newUser, specializations })
+                      }
+                      required={true}
+                      userType={newUser.userType}
+                    />
+                  )}
+
                   {/* Provider-specific fields */}
                   {newUser.userType === "provider" && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Specialization *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={newUser.specialization || ""}
-                          onChange={(e) =>
-                            setNewUser({
-                              ...newUser,
-                              specialization: e.target.value,
-                            })
-                          }
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                          placeholder="e.g., Mental Health, Life Coaching"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700">
-                          Price per Hour
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={newUser.price || 0}
-                          onChange={(e) =>
-                            setNewUser({
-                              ...newUser,
-                              price: parseFloat(e.target.value) || 0,
-                            })
-                          }
-                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                    </>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Price per Hour
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={newUser.price || 0}
+                        onChange={(e) =>
+                          setNewUser({
+                            ...newUser,
+                            price: parseFloat(e.target.value) || 0,
+                          })
+                        }
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
                   )}
                   
                   <div>

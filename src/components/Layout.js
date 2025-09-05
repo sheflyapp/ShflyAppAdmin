@@ -17,6 +17,7 @@ import {
   UserCircleIcon,
   SunIcon,
   MoonIcon,
+  QuestionMarkCircleIcon,
 } from '@heroicons/react/24/outline';
 
 const Layout = () => {
@@ -40,6 +41,7 @@ const Layout = () => {
     { name: t('common.consultations'), href: '/consultations', icon: ChatBubbleLeftRightIcon },
     { name: t('common.categories'), href: '/categories', icon: Squares2X2Icon },
     { name: t('common.payments'), href: '/payments', icon: CreditCardIcon },
+    { name: t('common.questions'), href: '/questions', icon: QuestionMarkCircleIcon },
   ];
 
   const handleLogout = () => {

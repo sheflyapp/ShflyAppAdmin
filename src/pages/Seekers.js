@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
+import SpecializationSelector from '../components/SpecializationSelector';
 import { 
   MagnifyingGlassIcon, 
   EyeIcon, 
@@ -46,6 +47,7 @@ const Seekers = () => {
     country: '',
     dob: '1990-01-01',
     bio: '',
+    specializations: [],
     isVerified: false,
     isActive: true
   });
@@ -194,17 +196,38 @@ const Seekers = () => {
 
   const handleCreateSeeker = async (seekerData) => {
     try {
-      const response = await callAPI.post('/api/admin/users', seekerData);
+      // Prepare seeker data with specializations
+      const seekerPayload = {
+        ...seekerData,
+        specializations: seekerData.specializations.map(spec => spec._id)
+      };
+
+      const response = await callAPI.post('/api/admin/users', seekerPayload);
       
       if (response.data.success) {
-        setSeekers([response.data.data, ...seekers]);
+        setSeekers([response.data.data.user, ...seekers]);
         setShowAddModal(false);
+        setNewSeeker({
+          fullname: '',
+          username: '',
+          email: '',
+          password: '',
+          userType: 'seeker',
+          phone: '',
+          gender: 'other',
+          country: '',
+          dob: '1990-01-01',
+          bio: '',
+          specializations: [],
+          isVerified: false,
+          isActive: true
+        });
         toast.success('Seeker created successfully');
         fetchSeekers(); // Refresh the list
       }
     } catch (error) {
       console.error('Error creating seeker:', error);
-      toast.error('Failed to create seeker');
+      toast.error(error.response?.data?.message || 'Failed to create seeker');
     }
   };
 
@@ -240,6 +263,13 @@ const Seekers = () => {
         Active
       </span>
     );
+  };
+
+  const formatSpecializations = (specializations) => {
+    if (!specializations || specializations.length === 0) {
+      return 'No specializations';
+    }
+    return specializations.map(spec => spec.name || spec).join(', ');
   };
 
   const calculateAge = (dob) => {
@@ -558,7 +588,7 @@ const Seekers = () => {
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
-                  Country
+                  Specializations
                 </th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
@@ -642,10 +672,12 @@ const Seekers = () => {
                   }`}>
                     {calculateAge(seeker.dob)} years
                   </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
+                  <td className={`px-6 py-4 text-sm transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                   }`}>
-                    {seeker.country}
+                    <div className="max-w-xs truncate" title={formatSpecializations(seeker.specializations)}>
+                      {formatSpecializations(seeker.specializations)}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="flex items-center">
@@ -787,7 +819,7 @@ const Seekers = () => {
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
                         }`}>
-                          {seeker.country}
+                          {formatSpecializations(seeker.specializations)}
                         </div>
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
@@ -909,7 +941,7 @@ const Seekers = () => {
                     <div className={`text-center text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
-                      {seeker.country}
+                      {formatSpecializations(seeker.specializations)}
                     </div>
                     <div className={`text-center text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
@@ -1036,10 +1068,10 @@ const Seekers = () => {
                 <div>
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}>Country</label>
+                  }`}>Specializations</label>
                   <p className={`text-sm transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}>{selectedSeeker.country}</p>
+                  }`}>{formatSpecializations(selectedSeeker.specializations)}</p>
                 </div>
                 
                 <div>
@@ -1448,6 +1480,16 @@ const Seekers = () => {
                       placeholder="Brief description about the seeker"
                     />
                   </div>
+
+                  {/* Specializations - Required for seekers */}
+                  <SpecializationSelector
+                    selectedSpecializations={newSeeker.specializations}
+                    onSpecializationsChange={(specializations) =>
+                      setNewSeeker({ ...newSeeker, specializations })
+                    }
+                    required={true}
+                    userType="seeker"
+                  />
                   
                   <div className="flex items-center">
                     <input
