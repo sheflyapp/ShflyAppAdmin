@@ -44,7 +44,7 @@ const Questions = () => {
         ...(priority !== "all" && { priority }),
       });
 
-      const response = await callAPI(`/api/questions?${params}`, "GET");
+      const response = await callAPI(`/api/admin/questions?${params}`, "GET");
       
       if (response.success) {
         setQuestions(response.data || []);
@@ -92,7 +92,7 @@ const Questions = () => {
   // Close question
   const handleCloseQuestion = async (questionId) => {
     try {
-      const response = await callAPI(`/api/questions/${questionId}/close`, "PATCH");
+      const response = await callAPI(`/api/admin/questions/${questionId}/close`, "PATCH");
       
       if (response.success) {
         toast.success("Question closed successfully");
@@ -113,7 +113,7 @@ const Questions = () => {
     }
 
     try {
-      const response = await callAPI(`/api/questions/${questionId}`, "DELETE");
+      const response = await callAPI(`/api/admin/questions/${questionId}`, "DELETE");
       
       if (response.success) {
         toast.success("Question deleted successfully");
