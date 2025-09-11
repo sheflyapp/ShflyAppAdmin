@@ -666,7 +666,12 @@ const Providers = () => {
                       <span className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
                         isDarkMode ? 'bg-blue-900/30 text-blue-200' : 'bg-blue-100 text-blue-800'
                       }`}>
-                        {provider.specialization}
+                        {provider.specialization?.map((item, index) => (
+    <span key={item.id || index}>
+      {item.name}
+      {index < provider.specialization.length - 1 && <span>, </span>}
+    </span>
+  ))}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
