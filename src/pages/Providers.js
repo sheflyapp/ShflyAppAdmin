@@ -663,16 +663,13 @@ const Providers = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
+                    {provider?.specializations?.map((item, index) => (
+                      <span key={index} className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
                         isDarkMode ? 'bg-blue-900/30 text-blue-200' : 'bg-blue-100 text-blue-800'
                       }`}>
-                        {provider.specialization?.map((item, index) => (
-    <span key={item.id || index}>
-      {item.name}
-      {index < provider.specialization.length - 1 && <span>, </span>}
-    </span>
-  ))}
+                      {item.name}
                       </span>
+                      ))}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
