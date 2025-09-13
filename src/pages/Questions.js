@@ -8,10 +8,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   UserIcon,
-  PencilSquareIcon,
-  PlusIcon,
   ChatBubbleLeftRightIcon,
-  ClockIcon,
   ExclamationTriangleIcon,
   TagIcon,
 } from "@heroicons/react/24/outline";
@@ -29,8 +26,6 @@ const Questions = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalQuestions, setTotalQuestions] = useState(0);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState(null);
 
   // Fetch questions
   const fetchQuestions = async (page = 1, search = "", status = "all", priority = "all") => {
@@ -44,12 +39,12 @@ const Questions = () => {
         ...(priority !== "all" && { priority }),
       });
 
-      const response = await callAPI(`/api/admin/questions?${params}`, "GET");
+      const response = await callAPI.get(`/api/admin/questions?${params}`);
       
-      if (response.success) {
-        setQuestions(response.data || []);
-        setTotalPages(response.pagination?.totalPages || 1);
-        setTotalQuestions(response.pagination?.totalQuestions || 0);
+      if (response.data.success) {
+        setQuestions(response.data.data || []);
+        setTotalPages(response.data.pagination?.totalPages || 1);
+        setTotalQuestions(response.data.pagination?.totalQuestions || 0);
       } else {
         toast.error("Failed to fetch questions");
       }
@@ -92,9 +87,9 @@ const Questions = () => {
   // Close question
   const handleCloseQuestion = async (questionId) => {
     try {
-      const response = await callAPI(`/api/admin/questions/${questionId}/close`, "PATCH");
+      const response = await callAPI.patch(`/api/admin/questions/${questionId}/close`);
       
-      if (response.success) {
+      if (response.data.success) {
         toast.success("Question closed successfully");
         fetchQuestions(currentPage, searchTerm, filterStatus, filterPriority);
       } else {
@@ -113,9 +108,9 @@ const Questions = () => {
     }
 
     try {
-      const response = await callAPI(`/api/admin/questions/${questionId}`, "DELETE");
+      const response = await callAPI.delete(`/api/admin/questions/${questionId}`);
       
-      if (response.success) {
+      if (response.data.success) {
         toast.success("Question deleted successfully");
         fetchQuestions(currentPage, searchTerm, filterStatus, filterPriority);
       } else {
@@ -124,6 +119,23 @@ const Questions = () => {
     } catch (error) {
       console.error("Error deleting question:", error);
       toast.error("Error deleting question");
+    }
+  };
+
+  // Update question status or priority
+  const handleUpdateQuestion = async (questionId, updateData) => {
+    try {
+      const response = await callAPI.patch(`/api/admin/questions/${questionId}/update`, updateData);
+      
+      if (response.data.success) {
+        toast.success("Question updated successfully");
+        fetchQuestions(currentPage, searchTerm, filterStatus, filterPriority);
+      } else {
+        toast.error("Failed to update question");
+      }
+    } catch (error) {
+      console.error("Error updating question:", error);
+      toast.error("Error updating question");
     }
   };
 
@@ -175,8 +187,8 @@ const Questions = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className={`min-h-screen`}>
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -427,6 +439,19 @@ const Questions = () => {
                               title="Close Question"
                             >
                               <CheckCircleIcon className="h-4 w-4" />
+                            </button>
+                          )}
+                          {question.priority !== "urgent" && (
+                            <button
+                              onClick={() => handleUpdateQuestion(question._id, { priority: "urgent" })}
+                              className={`p-2 rounded-lg transition-colors ${
+                                isDarkMode
+                                  ? "text-orange-400 hover:bg-orange-900"
+                                  : "text-orange-600 hover:bg-orange-100"
+                              }`}
+                              title="Mark as Urgent"
+                            >
+                              <ExclamationTriangleIcon className="h-4 w-4" />
                             </button>
                           )}
                           <button
