@@ -291,7 +291,7 @@ const StaticContent = () => {
                     type="text"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                       isDarkMode 
                         ? 'bg-gray-700 border-gray-600 text-white' 
                         : 'bg-white border-gray-300 text-gray-900'
@@ -314,7 +314,7 @@ const StaticContent = () => {
                       [currentLanguage === 'en' ? 'content' : 'contentAr']: e.target.value 
                     })}
                     rows={12}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                       isDarkMode 
                         ? 'bg-gray-700 border-gray-600 text-white' 
                         : 'bg-white border-gray-300 text-gray-900'
@@ -335,7 +335,7 @@ const StaticContent = () => {
                       type="text"
                       value={formData.seoTitle}
                       onChange={(e) => setFormData({ ...formData, seoTitle: e.target.value })}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                         isDarkMode 
                           ? 'bg-gray-700 border-gray-600 text-white' 
                           : 'bg-white border-gray-300 text-gray-900'
@@ -352,7 +352,7 @@ const StaticContent = () => {
                       type="text"
                       value={formData.version}
                       onChange={(e) => setFormData({ ...formData, version: e.target.value })}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                         isDarkMode 
                           ? 'bg-gray-700 border-gray-600 text-white' 
                           : 'bg-white border-gray-300 text-gray-900'
@@ -371,7 +371,7 @@ const StaticContent = () => {
                     value={formData.seoDescription}
                     onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value })}
                     rows={3}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                       isDarkMode 
                         ? 'bg-gray-700 border-gray-600 text-white' 
                         : 'bg-white border-gray-300 text-gray-900'
@@ -390,7 +390,7 @@ const StaticContent = () => {
                     value={formData.seoKeywords}
                     onChange={(e) => setFormData({ ...formData, seoKeywords: e.target.value })}
                     placeholder={t('staticContent.keywordsPlaceholder')}
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 ${
                       isDarkMode 
                         ? 'bg-gray-700 border-gray-600 text-white' 
                         : 'bg-white border-gray-300 text-gray-900'
@@ -404,7 +404,7 @@ const StaticContent = () => {
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
                   />
                   <label className={`ml-2 text-sm ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -430,7 +430,7 @@ const StaticContent = () => {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
+                    className="px-6 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:opacity-50 flex items-center"
                   >
                     {isLoading ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -509,7 +509,7 @@ const StaticContent = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center">
                     <Icon className={`h-8 w-8 mr-3 ${
-                      isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                      isDarkMode ? 'text-orange-400' : 'text-orange-600'
                     }`} />
                     <div>
                       <h3 className={`text-lg font-semibold ${
@@ -538,7 +538,7 @@ const StaticContent = () => {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleCreateNew(type.value)}
-                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center"
+                    className="flex-1 bg-custom-btnBg hover:bg-custom-btnBg/90 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center"
                   >
                     <PlusIcon className="h-4 w-4 mr-2" />
                     {existingContent ? t('staticContent.edit') : t('staticContent.create')}
@@ -569,7 +569,7 @@ const StaticContent = () => {
           
           {isLoading ? (
             <div className="p-6 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
               <p className={`mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 {t('common.loading')}
               </p>
@@ -633,7 +633,7 @@ const StaticContent = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <Icon className={`h-5 w-5 mr-3 ${
-                              isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                              isDarkMode ? 'text-orange-400' : 'text-orange-600'
                             }`} />
                             <span className={`text-sm font-medium ${
                               isDarkMode ? 'text-white' : 'text-gray-900'
@@ -670,7 +670,7 @@ const StaticContent = () => {
                           <div className="flex space-x-2">
                             <button
                               onClick={() => handleEdit(content)}
-                              className={`text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300`}
+                              className={`text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300`}
                             >
                               <PencilIcon className="h-4 w-4" />
                             </button>
