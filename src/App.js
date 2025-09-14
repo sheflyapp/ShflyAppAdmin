@@ -10,6 +10,7 @@ import Consultations from './pages/Consultations';
 import Categories from './pages/Categories';
 import Payments from './pages/Payments';
 import Questions from './pages/Questions';
+import StaticContent from './pages/StaticContent';
 import Login from './pages/Login';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -56,6 +57,7 @@ const AppRoutes = () => {
         <Route path="categories" element={<Categories />} />
         <Route path="payments" element={<Payments />} />
         <Route path="questions" element={<Questions />} />
+        <Route path="static-content" element={<StaticContent />} />
       </Route>
     </Routes>
   );

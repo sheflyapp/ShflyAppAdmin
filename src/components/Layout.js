@@ -18,6 +18,7 @@ import {
   SunIcon,
   MoonIcon,
   QuestionMarkCircleIcon,
+  DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 
 const Layout = () => {
@@ -42,6 +43,7 @@ const Layout = () => {
     { name: t('common.questions'), href: '/questions', icon: QuestionMarkCircleIcon },
     { name: t('common.categories'), href: '/categories', icon: Squares2X2Icon },
     { name: t('common.payments'), href: '/payments', icon: CreditCardIcon },
+    { name: t('staticContent.title'), href: '/static-content', icon: DocumentTextIcon },
   ];
 
   const handleLogout = () => {

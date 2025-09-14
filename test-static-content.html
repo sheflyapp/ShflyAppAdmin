@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Static Content APIs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Test Static Content APIs</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Test Get All Content -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Get All Content</h2>
+                <button onclick="testGetAllContent()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Test API
+                </button>
+                <div id="allContentResult" class="mt-4 p-4 bg-gray-50 rounded text-sm"></div>
+            </div>
+
+            <!-- Test Get Privacy Policy -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Get Privacy Policy</h2>
+                <button onclick="testGetPrivacyPolicy()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    Test API
+                </button>
+                <div id="privacyResult" class="mt-4 p-4 bg-gray-50 rounded text-sm"></div>
+            </div>
+
+            <!-- Test Get Terms in Arabic -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Get Terms (Arabic)</h2>
+                <button onclick="testGetTermsArabic()" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
+                    Test API
+                </button>
+                <div id="termsArResult" class="mt-4 p-4 bg-gray-50 rounded text-sm"></div>
+            </div>
+
+            <!-- Test Create Content -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h2 class="text-xl font-semibold mb-4">Create Sample Content</h2>
+                <button onclick="testCreateContent()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                    Test API
+                </button>
+                <div id="createResult" class="mt-4 p-4 bg-gray-50 rounded text-sm"></div>
+            </div>
+        </div>
+
+        <!-- Admin Panel Link -->
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Admin Panel</h2>
+            <p class="text-gray-600 mb-4">Access the full admin panel for content management:</p>
+            <a href="http://localhost:3000/static-content" class="bg-indigo-500 text-white px-6 py-3 rounded hover:bg-indigo-600 inline-block">
+                Open Admin Panel
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        async function testGetAllContent() {
+            try {
+                const response = await fetch(`${API_BASE}/content`);
+                const data = await response.json();
+                document.getElementById('allContentResult').innerHTML = 
+                    `<strong>Status:</strong> ${response.status}<br>
+                     <strong>Success:</strong> ${data.success}<br>
+                     <strong>Count:</strong> ${data.data.length} items<br>
+                     <strong>Response:</strong> <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('allContentResult').innerHTML = 
+                    `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+
+        async function testGetPrivacyPolicy() {
+            try {
+                const response = await fetch(`${API_BASE}/content/privacy-policy`);
+                const data = await response.json();
+                document.getElementById('privacyResult').innerHTML = 
+                    `<strong>Status:</strong> ${response.status}<br>
+                     <strong>Success:</strong> ${data.success}<br>
+                     <strong>Title:</strong> ${data.data?.title || 'N/A'}<br>
+                     <strong>Response:</strong> <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('privacyResult').innerHTML = 
+                    `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+
+        async function testGetTermsArabic() {
+            try {
+                const response = await fetch(`${API_BASE}/content/terms-conditions?lang=ar`);
+                const data = await response.json();
+                document.getElementById('termsArResult').innerHTML = 
+                    `<strong>Status:</strong> ${response.status}<br>
+                     <strong>Success:</strong> ${data.success}<br>
+                     <strong>Title:</strong> ${data.data?.title || 'N/A'}<br>
+                     <strong>Response:</strong> <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('termsArResult').innerHTML = 
+                    `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+
+        async function testCreateContent() {
+            try {
+                const sampleData = {
+                    title: 'Test FAQ',
+                    content: 'This is a test FAQ content.',
+                    contentAr: 'هذا محتوى اختبار للأسئلة الشائعة.',
+                    version: '1.0.0',
+                    seoTitle: 'Test FAQ - Shfly',
+                    seoDescription: 'Test FAQ for Shfly app',
+                    seoKeywords: 'test, faq, shfly'
+                };
+
+                const response = await fetch(`${API_BASE}/content/faq`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_ADMIN_TOKEN' // Replace with actual token
+                    },
+                    body: JSON.stringify(sampleData)
+                });
+                
+                const data = await response.json();
+                document.getElementById('createResult').innerHTML = 
+                    `<strong>Status:</strong> ${response.status}<br>
+                     <strong>Success:</strong> ${data.success}<br>
+                     <strong>Message:</strong> ${data.message}<br>
+                     <strong>Response:</strong> <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                document.getElementById('createResult').innerHTML = 
+                    `<strong>Error:</strong> ${error.message}<br>
+                     <strong>Note:</strong> This requires admin authentication. Use the admin panel instead.`;
+            }
+        }
+    </script>
+</body>
+</html>
