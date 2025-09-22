@@ -19,6 +19,7 @@ const Payments = () => {
   const { isDarkMode } = useTheme();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totals, setTotals] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterMethod, setFilterMethod] = useState('all');
@@ -28,6 +29,26 @@ const Payments = () => {
     // Default to grid view on mobile devices for better mobile experience
     return window.innerWidth < 768 ? "grid" : "table";
   }); // "table", "list", "grid"
+
+  // Currency to display in summary cards (SAR as requested)
+  const displayCurrency = 'SAR';
+
+  // Local currency conversion rates to SAR for frontend fallbacks
+  const currencyToSarRate = {
+    SAR: 1,
+    USD: 3.75,
+    EUR: 4.1,
+    GBP: 4.8,
+    AED: 1.02
+  };
+
+  const toSar = (amountCents, currency) => {
+    const rate = currencyToSarRate[currency] || 1;
+    const amount = (Number(amountCents) || 0) / 100; // backend amounts in cents
+    return amount * rate;
+  };
+
+  const fromCents = (amountCents) => (Number(amountCents) || 0) / 100;
 
  // Fetch payments from API
   useEffect(() => {
@@ -41,6 +62,7 @@ const fetchPayments = async () => {
     
     if (response.data.success) {
       setPayments(response.data.data.payments || []);
+      setTotals(response.data.data.totals || null);
     } else {
       toast.error('Failed to fetch payments');
     }
@@ -55,13 +77,18 @@ const fetchPayments = async () => {
 };
 
   const filteredPayments = payments.filter(payment => {
-    const matchesSearch = payment.seeker.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.provider.fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.transactionId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.consultationId.toLowerCase().includes(searchTerm.toLowerCase());
+    const seekerName = (payment?.seeker?.fullname || '').toString();
+    const providerName = (payment?.provider?.fullname || '').toString();
+    const transactionId = (payment?.transactionId || '').toString();
+    const consultationId = (payment?.consultationId || '').toString();
+
+    const matchesSearch = seekerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         providerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         transactionId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         consultationId.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = filterStatus === 'all' || payment.status === filterStatus;
-    const matchesMethod = filterMethod === 'all' || payment.paymentMethod === filterMethod;
+    const matchesStatus = filterStatus === 'all' || payment?.status === filterStatus;
+    const matchesMethod = filterMethod === 'all' || payment?.paymentMethod === filterMethod;
     
     return matchesSearch && matchesStatus && matchesMethod;
   });
@@ -119,7 +146,7 @@ const fetchPayments = async () => {
         dark: { bg: 'bg-yellow-900/30', text: 'text-yellow-400', border: 'border border-yellow-700' },
         icon: ClockIcon 
       },
-      completed: { 
+      success: { 
         light: { bg: 'bg-green-100', text: 'text-green-800' },
         dark: { bg: 'bg-green-900/30', text: 'text-green-400', border: 'border border-green-700' },
         icon: CheckCircleIcon 
@@ -224,16 +251,20 @@ const fetchPayments = async () => {
       .reduce((acc, p) => acc + (p.netAmount || 0), 0);
   };
 
-  const calculateTotalFees = () => {
+  // Deprecated in favor of SAR-based calculation
+
+  const calculateTotalFeesSar = () => {
     return payments
       .filter(p => p.status === 'completed')
-      .reduce((acc, p) => acc + (p.fee || 0), 0);
+      .reduce((acc, p) => acc + toSar(p.fee || 0, p.currency), 0);
   };
 
-  const calculateTotalRefunds = () => {
+  // Deprecated in favor of SAR-based calculation
+
+  const calculateTotalRefundsSar = () => {
     return payments
-      .filter(p => p.status === 'refunded')
-      .reduce((acc, p) => acc + (p.refundAmount || 0), 0);
+      .filter(p => p.status === 'cancelled' || p.status === 'refunded')
+      .reduce((acc, p) => acc + toSar((p.refundAmount || p.amount || 0), p.currency), 0);
   };
 
   if (loading) {
@@ -281,7 +312,7 @@ const fetchPayments = async () => {
               <p className={`text-2xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                {formatCurrency(calculateTotalRevenue())}
+                {formatCurrency((totals?.totalAmountSar ?? fromCents(calculateTotalRevenue())), displayCurrency)}
               </p>
             </div>
           </div>
@@ -305,7 +336,7 @@ const fetchPayments = async () => {
               <p className={`text-2xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                {payments.filter(p => p.status === 'completed').length}
+                {payments.filter(p => p.status === 'success').length}
               </p>
             </div>
           </div>
@@ -329,7 +360,7 @@ const fetchPayments = async () => {
               <p className={`text-2xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                {formatCurrency(calculateTotalFees())}
+                {formatCurrency(calculateTotalFeesSar(), displayCurrency)}
               </p>
             </div>
           </div>
@@ -353,7 +384,7 @@ const fetchPayments = async () => {
               <p className={`text-2xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
-                {formatCurrency(calculateTotalRefunds())}
+                {formatCurrency((totals?.statusTotals?.cancelled?.amountSar ?? calculateTotalRefundsSar()), displayCurrency)}
               </p>
             </div>
           </div>
@@ -487,6 +518,11 @@ const fetchPayments = async () => {
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
+                  S.No.
+                </th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                }`}>
                   Transaction
                 </th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
@@ -503,11 +539,6 @@ const fetchPayments = async () => {
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
                   Status
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>
-                  Gateway
                 </th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
@@ -550,16 +581,19 @@ const fetchPayments = async () => {
                   </td>
                 </tr>
               ) : (
-              filteredPayments.map((payment) => (
+              filteredPayments.map((payment,index) => (
                 <tr key={payment._id} className={`transition-colors duration-300 ${
                   isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                 }`}>
+                   <td className="px-6 py-4 whitespace-nowrap">
+                    {index + 1}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="space-y-1">
                       <div className={`text-sm font-medium transition-colors duration-300 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                       }`}>
-                        {payment.seeker.fullname} → {payment.provider.fullname}
+                        {(payment?.seekerId?.fullname || payment?.seekerId?.email || 'Unknown Seeker')} → {(payment?.providerId?.fullname || payment?.providerId?.email || 'Unknown Provider')}
                       </div>
                       <div className={`text-xs transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-300' : 'text-gray-500'
@@ -574,13 +608,13 @@ const fetchPayments = async () => {
                       <div className={`text-sm font-medium transition-colors duration-300 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                       }`}>
-                        {formatCurrency(payment.amount, payment.currency)}
+                        {formatCurrency(fromCents(payment.amount), payment.currency)}
                       </div>
                       {payment.fee > 0 && (
                         <div className={`text-xs transition-colors duration-300 ${
                           isDarkMode ? 'text-gray-300' : 'text-gray-500'
                         }`}>
-                          Fee: {formatCurrency(payment.fee, payment.currency)}
+                          Fee: {formatCurrency(fromCents(payment.fee), payment.currency)}
                         </div>
                       )}
                       {payment.refundAmount > 0 && (
@@ -595,11 +629,6 @@ const fetchPayments = async () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(payment.status)}
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
-                    isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    <span className="capitalize">{payment.gateway}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <div className="space-y-1">
@@ -701,7 +730,7 @@ const fetchPayments = async () => {
                         <div className={`text-lg font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}>
-                          {payment.seeker.fullname} → {payment.provider.fullname}
+                          {(payment?.seeker?.fullname || 'Unknown Seeker')} → {(payment?.provider?.fullname || 'Unknown Provider')}
                         </div>
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
@@ -722,7 +751,7 @@ const fetchPayments = async () => {
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
                         }`}>
-                          {formatCurrency(payment.amount, payment.currency)}
+                          {formatCurrency(fromCents(payment.amount), payment.currency)}
                         </div>
                       </div>
                       <div className="flex justify-start sm:justify-end space-x-2">
@@ -805,7 +834,7 @@ const fetchPayments = async () => {
                     <div className={`text-lg font-medium transition-colors duration-300 ${
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}>
-                      {payment.seeker.fullname} → {payment.provider.fullname}
+                      {(payment?.seeker?.fullname || 'Unknown Seeker')} → {(payment?.provider?.fullname || 'Unknown Provider')}
                     </div>
                     <div className={`text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
@@ -824,7 +853,7 @@ const fetchPayments = async () => {
                     <div className={`text-center text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
-                      {formatCurrency(payment.amount, payment.currency)}
+                      {formatCurrency(fromCents(payment.amount), payment.currency)}
                     </div>
                   </div>
                   <div className="flex justify-center space-x-2">
@@ -907,10 +936,10 @@ const fetchPayments = async () => {
                   }`}>Seeker</label>
                   <p className={`text-sm transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}>{selectedPayment.seeker.fullname}</p>
+                  }`}>{selectedPayment?.seeker?.fullname || 'Unknown Seeker'}</p>
                   <p className={`text-xs transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`}>{selectedPayment.seeker.email}</p>
+                  }`}>{selectedPayment?.seeker?.email || '—'}</p>
                 </div>
                 
                 <div>
@@ -919,10 +948,10 @@ const fetchPayments = async () => {
                   }`}>Provider</label>
                   <p className={`text-sm transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}>{selectedPayment.provider.fullname}</p>
+                  }`}>{selectedPayment?.provider?.fullname || 'Unknown Provider'}</p>
                   <p className={`text-xs transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`}>{selectedPayment.provider.email}</p>
+                  }`}>{selectedPayment?.provider?.email || '—'}</p>
                 </div>
                 
                 <div>
@@ -932,7 +961,7 @@ const fetchPayments = async () => {
                   <p className={`text-sm transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                   }`}>
-                    {formatCurrency(selectedPayment.amount, selectedPayment.currency)}
+                    {formatCurrency(fromCents(selectedPayment.amount), selectedPayment.currency)}
                   </p>
                 </div>
                 
@@ -957,20 +986,11 @@ const fetchPayments = async () => {
                 <div>
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}>Gateway</label>
-                  <p className={`text-sm transition-colors duration-300 capitalize ${
-                    isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}>{selectedPayment.gateway}</p>
-                </div>
-                
-                <div>
-                  <label className={`text-sm font-medium transition-colors duration-300 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Fee</label>
                   <p className={`text-sm transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                   }`}>
-                    {formatCurrency(selectedPayment.fee, selectedPayment.currency)}
+                    {formatCurrency(fromCents(selectedPayment.fee), selectedPayment.currency)}
                   </p>
                 </div>
                 
@@ -981,7 +1001,7 @@ const fetchPayments = async () => {
                   <p className={`text-sm transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                   }`}>
-                    {formatCurrency(selectedPayment.netAmount, selectedPayment.currency)}
+                    {formatCurrency(fromCents(selectedPayment.netAmount), selectedPayment.currency)}
                   </p>
                 </div>
                 
@@ -1011,7 +1031,7 @@ const fetchPayments = async () => {
                     <p className={`text-sm transition-colors duration-300 ${
                       isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                      {formatCurrency(selectedPayment.refundAmount, selectedPayment.currency)}
+                      {formatCurrency(fromCents(selectedPayment.refundAmount), selectedPayment.currency)}
                     </p>
                   </div>
                 )}

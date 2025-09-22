@@ -24,9 +24,12 @@ const Dashboard = () => {
     totalSeekers: 0,
     totalCategories: 0,
     totalConsultations: 0,
+    totalQuestions: 0,
     totalRevenue: 0,
   });
-  const [recentConsultations, setRecentConsultations] = useState([]);
+  const [paymentsStats, setPaymentsStats] = useState(null);
+  const [recentQuestions, setRecentQuestions] = useState([]);
+  const [charts, setCharts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState(() => {
     // Default to grid view on mobile devices for better mobile experience
@@ -46,21 +49,47 @@ const Dashboard = () => {
       
       // Extract data from the nested response structure
       if (statsResponse.data.success && statsResponse.data.data) {
-        const { overview } = statsResponse.data.data;
+        const { overview, payments } = statsResponse.data.data;
         setStats({
           totalUsers: overview?.totalUsers || 0,
           totalProviders: overview?.totalProviders || 0,
           totalSeekers: overview?.totalSeekers || 0,
           totalCategories: overview?.totalCategories || 0,
           totalConsultations: overview?.totalConsultations || 0,
+          totalQuestions: overview?.totalQuestions || 0,
           totalRevenue: overview?.totalRevenue || 0,
         });
+        setPaymentsStats(payments || null);
       }
       
-      // Fetch recent consultations from the stats response
+      // Fetch recent questions and charts from the stats response
       if (statsResponse.data.success && statsResponse.data.data) {
-        const { recent } = statsResponse.data.data;
-        setRecentConsultations(recent?.consultations || []);
+        const { recent, charts: chartsData } = statsResponse.data.data;
+        const recentQs = recent?.questions || [];
+        setRecentQuestions(recentQs);
+        setCharts(chartsData || []);
+      }
+
+      // Fallback: If no recent questions came from stats API, pull last 6 via questions API
+      if ((!statsResponse.data?.data?.recent?.questions || statsResponse.data.data.recent.questions.length === 0)) {
+        try {
+          const qsRes = await callAPI.get('/api/questions?limit=6');
+              if (qsRes.data?.success && qsRes.data?.data?.questions) {
+            const mapped = qsRes.data.data.questions.map(q => ({
+              _id: q._id,
+              postedBy: { fullname: q.userId?.fullname, email: q.userId?.email },
+              solvedBy: null,
+              category: q.category?.name,
+              subcategory: q.subcategory?.name,
+                  description: q.description,
+              status: q.status,
+              createdAt: q.createdAt
+            }));
+            setRecentQuestions(mapped);
+          }
+        } catch (e) {
+          // ignore fallback errors
+        }
       }
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -71,11 +100,21 @@ const Dashboard = () => {
         totalSeekers: 0,
         totalCategories: 0,
         totalConsultations: 0,
+        totalQuestions: 0,
         totalRevenue: 0,
       });
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatCurrencySAR = (amount) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'SAR' }).format(Number(amount || 0));
+
+  const truncateWords = (text, maxWords = 4) => {
+    if (!text) return '';
+    const words = String(text).trim().split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '...';
   };
 
   const statCards = [
@@ -109,7 +148,7 @@ const Dashboard = () => {
     },
     // Row 2: Categories, Consultations, Payments
     {
-      name: t('dashboard.totalCategories'),
+      name: t('Total Categories'),
       value: stats.totalCategories || 0,
       icon: Squares2X2Icon,
       change: '+5%',
@@ -118,33 +157,63 @@ const Dashboard = () => {
       link: '/categories',
     },
     {
-      name: t('dashboard.totalConsultations'),
-      value: stats.totalConsultations || 0,
+      name: t('Total Questions'),
+      value: stats.totalQuestions || 0,
       icon: ChatBubbleLeftRightIcon,
       change: '+23%',
       changeType: 'positive',
       color: 'bg-purple-500',
-      link: '/consultations',
+      link: '/questions',
     },
     {
       name: t('dashboard.totalRevenue'),
-      value: `₹${(stats.totalRevenue || 0).toLocaleString()}`,
+      value: formatCurrencySAR(stats.totalRevenue || 0),
       icon: CreditCardIcon,
       change: '+18%',
       changeType: 'positive',
       color: 'bg-yellow-500',
       link: '/payments',
     },
+    // Payments KPIs (SAR)
+    {
+      name: 'Total Payments',
+      value: paymentsStats?.totalPayments || 0,
+      icon: CreditCardIcon,
+      change: '',
+      changeType: 'positive',
+      color: 'bg-teal-500',
+      link: '/payments',
+    },
+    {
+      name: 'Successful Amount (SAR)',
+      value: formatCurrencySAR(paymentsStats?.statusTotals?.success?.amountSar || 0),
+      icon: ArrowTrendingUpIcon,
+      change: '',
+      changeType: 'positive',
+      color: 'bg-green-600',
+      link: '/payments',
+    },
+    {
+      name: 'Failed Amount (SAR)',
+      value: formatCurrencySAR(paymentsStats?.statusTotals?.failed?.amountSar || 0),
+      icon: ArrowTrendingDownIcon,
+      change: '',
+      changeType: 'negative',
+      color: 'bg-red-600',
+      link: '/payments',
+    },
+    {
+      name: 'Cancelled Amount (SAR)',
+      value: formatCurrencySAR(paymentsStats?.statusTotals?.cancelled?.amountSar || 0),
+      icon: ArrowTrendingDownIcon,
+      change: '',
+      changeType: 'negative',
+      color: 'bg-gray-600',
+      link: '/payments',
+    },
   ];
 
-  const chartData = [
-    { name: 'Jan', users: 65, consultations: 28, revenue: 12000 },
-    { name: 'Feb', users: 78, consultations: 35, revenue: 15000 },
-    { name: 'Mar', users: 90, consultations: 42, revenue: 18000 },
-    { name: 'Apr', users: 105, consultations: 48, revenue: 22000 },
-    { name: 'May', users: 120, consultations: 55, revenue: 25000 },
-    { name: 'Jun', users: 135, consultations: 62, revenue: 28000 },
-  ];
+  const chartData = charts;
 
   if (loading) {
     return (
@@ -255,7 +324,7 @@ const Dashboard = () => {
                 }}
               />
               <Line type="monotone" dataKey="users" stroke="#3B82F6" strokeWidth={2} />
-              <Line type="monotone" dataKey="consultations" stroke="#8B5CF6" strokeWidth={2} />
+              <Line type="monotone" dataKey="questions" stroke="#8B5CF6" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -296,7 +365,7 @@ const Dashboard = () => {
         <div className="flex flex-col gap-4 mb-4">
           <h3 className={`text-lg font-medium transition-colors duration-300 ${
             isDarkMode ? 'text-white' : 'text-gray-900'
-          }`}>{t('consultations.title')}</h3>
+          }`}>Recent Questions</h3>
           
           {/* View Toggle Buttons */}
           <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 justify-center sm:justify-start">
@@ -358,33 +427,33 @@ const Dashboard = () => {
               <tr>
                 <th className={`table-header transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>{t('common.providers')}</th>
+                }`}>Posted By</th>
                 <th className={`table-header transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>{t('common.seekers')}</th>
+                }`}>Solved By</th>
                 <th className={`table-header transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>{t('common.categories')}</th>
+                }`}>Category</th>
                 <th className={`table-header transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>{t('consultations.type')}</th>
+                }`}>Desc.</th>
                 <th className={`table-header transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>{t('common.status')}</th>
+                }`}>Subcategory</th>
                 <th className={`table-header transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>{t('common.price')}</th>
+                }`}>Status</th>
                 <th className={`table-header transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-500'
-                }`}>{t('common.date')}</th>
+                }`}>Date</th>
               </tr>
             </thead>
             <tbody className={`divide-y transition-colors duration-300 ${
               isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
             }`}>
-              {recentConsultations.length > 0 ? (
-                recentConsultations.map((consultation) => (
-                  <tr key={consultation._id}>
+              {recentQuestions.length > 0 ? (
+                recentQuestions.map((q) => (
+                  <tr key={q._id}>
                     <td className={`table-cell transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-200' : 'text-gray-900'
                     }`}>
@@ -395,14 +464,14 @@ const Dashboard = () => {
                           <span className={`text-sm font-medium transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-200' : 'text-gray-700'
                           }`}>
-                            {consultation.provider?.fullname?.charAt(0) || '?'}
+                            {q.postedBy?.fullname?.charAt(0) || '?'}
                           </span>
                         </div>
                         <div className="ml-3">
                           <div className={`text-sm font-medium transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>
-                            {consultation.provider?.fullname || 'Unknown Provider'}
+                            {q.postedBy?.fullname || q.postedBy?.email || 'Unknown'}
                           </div>
                         </div>
                       </div>
@@ -417,44 +486,44 @@ const Dashboard = () => {
                           <span className={`text-sm font-medium transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-200' : 'text-gray-700'
                           }`}>
-                            {consultation.seeker?.fullname?.charAt(0) || '?'}
+                            {q.solvedBy?.fullname?.charAt(0) || '?'}
                           </span>
                         </div>
                         <div className="ml-3">
                           <div className={`text-sm font-medium transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>
-                            {consultation.seeker?.fullname || 'Unknown Seeker'}
+                            {q.solvedBy?.fullname || q.solvedBy?.email || '—'}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className={`table-cell transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-200' : 'text-gray-900'
-                    }`}>{consultation.category || 'N/A'}</td>
-                    <td className={`table-cell capitalize transition-colors duration-300 ${
+                    }`}>{q.category || 'N/A'}</td>
+                    <td title={q.description} className={`table-cell transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-200' : 'text-gray-900'
-                    }`}>{consultation.consultationType || 'N/A'}</td>
+                    }`}>{truncateWords(q.description, 4) || '—'}</td>
+                    <td className={`table-cell transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                    }`}>{q.subcategory || 'N/A'}</td>
                     <td className="table-cell">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-300 ${
-                        consultation.status === 'completed' ? 
+                        q.status === 'answered' ? 
                           (isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
-                        consultation.status === 'pending' ? 
+                        q.status === 'pending' ? 
                           (isDarkMode ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800') :
-                        consultation.status === 'accepted' ? 
+                        q.status === 'closed' ? 
                           (isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800') :
                           (isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800')
                       }`}>
-                        {consultation.status || 'N/A'}
+                        {q.status || 'N/A'}
                       </span>
                     </td>
                     <td className={`table-cell transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-200' : 'text-gray-900'
-                    }`}>₹{consultation.price || 0}</td>
-                    <td className={`table-cell transition-colors duration-300 ${
-                      isDarkMode ? 'text-gray-200' : 'text-gray-900'
                     }`}>
-                      {consultation.createdAt ? new Date(consultation.createdAt).toLocaleDateString() : 'N/A'}
+                      {q.createdAt ? new Date(q.createdAt).toLocaleDateString() : 'N/A'}
                     </td>
                   </tr>
                 ))
@@ -463,7 +532,7 @@ const Dashboard = () => {
                   <td colSpan="7" className={`px-6 py-4 text-center transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                   }`}>
-                    {t('messages.noData')}
+                    No questions found
                   </td>
                 </tr>
               )}
@@ -475,7 +544,7 @@ const Dashboard = () => {
         {/* List View */}
         {viewMode === "list" && (
           <div className="space-y-3">
-            {recentConsultations.length === 0 ? (
+            {recentQuestions.length === 0 ? (
               <div className="text-center py-12">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
                   isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
@@ -484,17 +553,17 @@ const Dashboard = () => {
                 </div>
                 <h3 className={`text-lg font-medium transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-900'
-                }`}>No consultations found</h3>
+                }`}>No questions found</h3>
                 <p className={`text-sm transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 }`}>
-                  No recent consultation records available at the moment
+                  No recent question records available at the moment
                 </p>
               </div>
             ) : (
-              recentConsultations.map((consultation) => (
+              recentQuestions.map((q) => (
                 <div
-                  key={consultation._id}
+                  key={q._id}
                   className={`p-4 rounded-lg border transition-all duration-300 ${
                     isDarkMode 
                       ? "border-gray-700 bg-gray-800 hover:bg-gray-700" 
@@ -518,43 +587,43 @@ const Dashboard = () => {
                         <div className={`text-lg font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}>
-                          {consultation.provider?.fullname || 'Unknown Provider'} → {consultation.seeker?.fullname || 'Unknown Seeker'}
+                          {q.postedBy?.fullname || q.postedBy?.email || 'Unknown'} {q.solvedBy ? `→ ${q.solvedBy?.fullname || q.solvedBy?.email}` : ''}
                         </div>
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
                         }`}>
-                          {consultation.category || 'N/A'}
+                          {q.category || 'N/A'}
                         </div>
                         <div className={`text-xs transition-colors duration-300 ${
                           isDarkMode ? "text-gray-400" : "text-gray-400"
                         }`}>
-                          {consultation.createdAt ? new Date(consultation.createdAt).toLocaleDateString() : 'N/A'}
+                          {q.createdAt ? new Date(q.createdAt).toLocaleDateString() : 'N/A'}
                         </div>
                       </div>
                     </div>
                     <div className="text-left lg:text-right">
                       <div className="mb-1">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-300 ${
-                          consultation.status === 'completed' ? 
+                          q.status === 'answered' ? 
                             (isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
-                          consultation.status === 'pending' ? 
+                          q.status === 'pending' ? 
                             (isDarkMode ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800') :
-                          consultation.status === 'accepted' ? 
+                          q.status === 'closed' ? 
                             (isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800') :
                             (isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800')
                         }`}>
-                          {consultation.status || 'N/A'}
+                          {q.status || 'N/A'}
                         </span>
                       </div>
                       <div className={`text-sm transition-colors duration-300 ${
                         isDarkMode ? "text-gray-300" : "text-gray-500"
                       }`}>
-                        ₹{consultation.price || 0}
+                        {q.category || 'N/A'}
                       </div>
                       <div className={`text-xs transition-colors duration-300 ${
                         isDarkMode ? "text-gray-400" : "text-gray-500"
                       }`}>
-                        {consultation.consultationType || 'N/A'}
+                        {q.subcategory || 'N/A'}
                       </div>
                     </div>
                   </div>
@@ -567,7 +636,7 @@ const Dashboard = () => {
         {/* Grid View */}
         {viewMode === "grid" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recentConsultations.length === 0 ? (
+            {recentQuestions.length === 0 ? (
               <div className="col-span-full text-center py-12">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
                   isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
@@ -576,17 +645,17 @@ const Dashboard = () => {
                 </div>
                 <h3 className={`text-lg font-medium transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-900'
-                }`}>No consultations found</h3>
+                }`}>No questions found</h3>
                 <p className={`text-sm transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 }`}>
-                  No recent consultation records available at the moment
+                  No recent question records available at the moment
                 </p>
               </div>
             ) : (
-              recentConsultations.map((consultation) => (
+              recentQuestions.map((q) => (
                 <div
-                  key={consultation._id}
+                  key={q._id}
                   className={`p-4 rounded-lg border transition-all duration-300 ${
                     isDarkMode 
                       ? "border-gray-700 bg-gray-800 hover:bg-gray-700" 
@@ -608,42 +677,42 @@ const Dashboard = () => {
                     <div className={`text-lg font-medium transition-colors duration-300 ${
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}>
-                      {consultation.provider?.fullname || 'Unknown Provider'} → {consultation.seeker?.fullname || 'Unknown Seeker'}
+                      {q.postedBy?.fullname || q.postedBy?.email || 'Unknown'} {q.solvedBy ? `→ ${q.solvedBy?.fullname || q.solvedBy?.email}` : ''}
                     </div>
                     <div className={`text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
-                      {consultation.category || 'N/A'}
+                      {q.category || 'N/A'}
                     </div>
                     <div className={`text-xs transition-colors duration-300 ${
                       isDarkMode ? "text-gray-400" : "text-gray-400"
                     }`}>
-                      {consultation.createdAt ? new Date(consultation.createdAt).toLocaleDateString() : 'N/A'}
+                      {q.createdAt ? new Date(q.createdAt).toLocaleDateString() : 'N/A'}
                     </div>
                   </div>
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-center">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-300 ${
-                        consultation.status === 'completed' ? 
+                        q.status === 'answered' ? 
                           (isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') :
-                        consultation.status === 'pending' ? 
+                        q.status === 'pending' ? 
                           (isDarkMode ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800') :
-                        consultation.status === 'accepted' ? 
+                        q.status === 'closed' ? 
                           (isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800') :
                           (isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800')
                       }`}>
-                        {consultation.status || 'N/A'}
+                        {q.status || 'N/A'}
                       </span>
                     </div>
                     <div className={`text-center text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
-                      ₹{consultation.price || 0}
+                      {q.category || 'N/A'}
                     </div>
                     <div className={`text-center text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
-                      {consultation.consultationType || 'N/A'}
+                      {q.subcategory || 'N/A'}
                     </div>
                   </div>
                 </div>
