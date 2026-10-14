@@ -6,7 +6,7 @@ const callAPI = axios.create({
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       ? 'http://localhost:5000' 
       : 'https://shflyappapi.onrender.com'),
-  timeout: 10000,
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   },
