@@ -37,7 +37,7 @@ const ProtectedRoute = ({ children }) => {
 
 // App Routes
 const AppRoutes = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   return (
     <Routes>

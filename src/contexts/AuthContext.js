@@ -60,6 +60,7 @@ export const AuthProvider = ({ children }) => {
 
       return () => clearInterval(interval);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   const checkAuthStatus = async () => {
@@ -167,7 +168,6 @@ export const AuthProvider = ({ children }) => {
       toast.success('Password changed successfully');
       return true;
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to change password';
       throw error;
     }
   };

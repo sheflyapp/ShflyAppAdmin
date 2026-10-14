@@ -54,6 +54,7 @@ const Seekers = () => {
 
   useEffect(() => {
     fetchSeekers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, searchTerm, filterStatus, filterCountry]);
 
   const fetchSeekers = async () => {
@@ -287,12 +288,6 @@ const Seekers = () => {
     return age;
   };
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  };
 
   const getUserTypeBadge = (userType) => {
     // Safety check for undefined or null userType

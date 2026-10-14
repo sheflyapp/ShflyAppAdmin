@@ -25,7 +25,7 @@ import {
 
 const StaticContent = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  useAuth();
   const { currentLanguage } = useLanguage();
   const { isDarkMode } = useTheme();
   
@@ -94,6 +94,7 @@ const StaticContent = () => {
 
   useEffect(() => {
     loadAllContent();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadAllContent = async () => {

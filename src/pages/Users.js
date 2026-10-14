@@ -52,6 +52,7 @@ const Users = () => {
 
   useEffect(() => {
     fetchUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, searchTerm, filterType]);
 
   const fetchUsers = async () => {
