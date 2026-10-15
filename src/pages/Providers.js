@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
+import { ListPageSkeleton } from '../components/Skeleton';
 import SpecializationSelector from '../components/SpecializationSelector';
 import { 
   MagnifyingGlassIcon, 
@@ -16,6 +17,7 @@ import {
   UserGroupIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
+import Pagination from '../components/Pagination';
 
 const Providers = () => {
   const { isDarkMode } = useTheme();
@@ -23,6 +25,7 @@ const Providers = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSpecialization, setFilterSpecialization] = useState('all');
+  const [specializationOptions, setSpecializationOptions] = useState([]);
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [showProviderModal, setShowProviderModal] = useState(false);
@@ -88,6 +91,24 @@ const Providers = () => {
     fetchProviders();
   }, [fetchProviders]);
 
+  // Specialization filter options come from the categories list
+  useEffect(() => {
+    const fetchSpecializationOptions = async () => {
+      try {
+        const response = await callAPI.get('/api/admin/categories');
+        if (response.data.success) {
+          const list = (response.data.data?.categories || [])
+            .filter(category => category.isActive)
+            .sort((a, b) => a.name.localeCompare(b.name));
+          setSpecializationOptions(list);
+        }
+      } catch (error) {
+        console.error('Error fetching specializations:', error);
+      }
+    };
+    fetchSpecializationOptions();
+  }, []);
+
   const filteredProviders = providers.filter(provider => {
     // Ensure provider object exists and has required properties
     if (!provider || typeof provider !== 'object') return false;
@@ -95,13 +116,14 @@ const Providers = () => {
     // Safe search with null checks
     const fullname = (provider.fullname || '').toString();
     const email = (provider.email || '').toString();
-    const specialization = (provider.specialization || '').toString();
+    const specialization = (provider.specializations || []).map(spec => spec.name || '').join(' ');
     
     const matchesSearch = fullname.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          specialization.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesSpecialization = filterSpecialization === 'all' || provider.specialization === filterSpecialization;
+    const matchesSpecialization = filterSpecialization === 'all' ||
+                                  (provider.specializations || []).some(spec => (spec._id || spec) === filterSpecialization);
     const matchesStatus = filterStatus === 'all' || 
                          (filterStatus === 'verified' && provider.isVerified) ||
                          (filterStatus === 'unverified' && !provider.isVerified) ||
@@ -110,8 +132,6 @@ const Providers = () => {
     
     return matchesSearch && matchesSpecialization && matchesStatus;
   });
-
-  const specializations = [...new Set(providers.filter(p => p.specialization && p.specialization.trim()).map(p => p.specialization.trim()))];
 
   const handleViewProvider = (provider) => {
     setSelectedProvider(provider);
@@ -334,77 +354,51 @@ const Providers = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 transition-colors duration-300 ${
-          isDarkMode ? 'border-primary-400' : 'border-primary-600'
-        }`}></div>
-      </div>
-    );
+    return <ListPageSkeleton selects={2} columns={7} />;
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-6">
-        <div className="flex flex-col lg:flex-row justify-between items-center">
-        <div className="mb-2 lg:mb-0">
-            <h1 className={`text-2xl font-bold transition-colors duration-300 ${
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>Providers Management</h1>
-            <p className={`transition-colors duration-300 ${
-              isDarkMode ? 'text-gray-300' : 'text-gray-600'
-            }`}>Manage all service providers in the system</p>
-          </div>
-          <button
-            onClick={handleAddProvider}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
-          >
-            <PlusIcon className="h-4 w-4 mr-2" />
-            Add Provider
-          </button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
+    <div className="animate-fade-in h-full flex flex-col">
+      <div className="mb-6 shrink-0 flex flex-wrap items-center justify-between gap-3">
+  <div className="flex flex-wrap gap-3">
+        <div className={`rounded-lg shadow-lg px-3 py-2 transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
         }`}>
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg transition-colors duration-300 ${
+            <div className={`p-1.5 rounded-lg transition-colors duration-300 ${
               isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'
             }`}>
-              <UserIcon className={`h-6 w-6 transition-colors duration-300 ${
+              <UserIcon className={`h-5 w-5 transition-colors duration-300 ${
                 isDarkMode ? 'text-purple-400' : 'text-purple-600'
               }`} />
             </div>
-            <div className="ml-4">
-              <p className={`text-sm font-medium transition-colors duration-300 ${
+            <div className="ml-3">
+              <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
-              }`}>Total Providers</p>
-              <p className={`text-2xl font-bold transition-colors duration-300 ${
+              }`}>Total</p>
+              <p className={`text-xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>{providers.length}</p>
             </div>
           </div>
         </div>
         
-        <div className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
+        <div className={`rounded-lg shadow-lg px-3 py-2 transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
         }`}>
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg transition-colors duration-300 ${
+            <div className={`p-1.5 rounded-lg transition-colors duration-300 ${
               isDarkMode ? 'bg-green-900/30' : 'bg-green-100'
             }`}>
-              <CheckCircleIcon className={`h-6 w-6 transition-colors duration-300 ${
+              <CheckCircleIcon className={`h-5 w-5 transition-colors duration-300 ${
                 isDarkMode ? 'text-green-400' : 'text-green-600'
               }`} />
             </div>
-            <div className="ml-4">
-              <p className={`text-sm font-medium transition-colors duration-300 ${
+            <div className="ml-3">
+              <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
-              }`}>Verified Providers</p>
-              <p className={`text-2xl font-bold transition-colors duration-300 ${
+              }`}>Verified</p>
+              <p className={`text-xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 {providers.filter(p => p.isVerified).length}
@@ -413,22 +407,22 @@ const Providers = () => {
           </div>
         </div>
         
-        <div className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
+        <div className={`rounded-lg shadow-lg px-3 py-2 transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
         }`}>
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg transition-colors duration-300 ${
+            <div className={`p-1.5 rounded-lg transition-colors duration-300 ${
               isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'
             }`}>
-              <StarIcon className={`h-6 w-6 transition-colors duration-300 ${
+              <StarIcon className={`h-5 w-5 transition-colors duration-300 ${
                 isDarkMode ? 'text-blue-400' : 'text-blue-600'
               }`} />
             </div>
-            <div className="ml-4">
-              <p className={`text-sm font-medium transition-colors duration-300 ${
+            <div className="ml-3">
+              <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Avg Rating</p>
-              <p className={`text-2xl font-bold transition-colors duration-300 ${
+              <p className={`text-xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 {providers.length > 0 
@@ -440,22 +434,22 @@ const Providers = () => {
           </div>
         </div>
         
-        <div className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
+        <div className={`rounded-lg shadow-lg px-3 py-2 transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
         }`}>
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg transition-colors duration-300 ${
+            <div className={`p-1.5 rounded-lg transition-colors duration-300 ${
               isDarkMode ? 'bg-green-900/30' : 'bg-green-100'
             }`}>
-              <CurrencyDollarIcon className={`h-6 w-6 transition-colors duration-300 ${
+              <CurrencyDollarIcon className={`h-5 w-5 transition-colors duration-300 ${
                 isDarkMode ? 'text-green-400' : 'text-green-600'
               }`} />
             </div>
-            <div className="ml-4">
-              <p className={`text-sm font-medium transition-colors duration-300 ${
+            <div className="ml-3">
+              <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Avg Price</p>
-              <p className={`text-2xl font-bold transition-colors duration-300 ${
+              <p className={`text-xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 ${providers.length > 0 
@@ -467,17 +461,8 @@ const Providers = () => {
           </div>
         </div>
       </div>
-
-      {/* Filters and Search */}
-      <div className={`rounded-lg shadow-lg mb-6 transition-all duration-300 ${
-        isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
-      }`}>
-        <div className={`p-6 border-b transition-colors duration-300 ${
-          isDarkMode ? 'border-gray-700' : 'border-gray-200'
-        }`}>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
+<div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
+              <div className="relative w-full sm:w-56">
                 <MagnifyingGlassIcon className={`h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-400' : 'text-gray-400'
                 }`} />
@@ -493,13 +478,9 @@ const Providers = () => {
                   }`}
                 />
               </div>
-            </div>
-            
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-2">
                 <select
                   value={filterSpecialization}
-                  onChange={(e) => setFilterSpecialization(e.target.value)}
+                  onChange={(e) => { setFilterSpecialization(e.target.value); setCurrentPage(1); }}
                   className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
                     isDarkMode 
                       ? 'border-gray-600 bg-gray-700 text-white' 
@@ -507,14 +488,14 @@ const Providers = () => {
                   }`}
                 >
                   <option value="all">All Specializations</option>
-                  {specializations.map(spec => (
-                    <option key={spec} value={spec}>{spec}</option>
+                  {specializationOptions.map(spec => (
+                    <option key={spec._id} value={spec._id}>{spec.name}</option>
                   ))}
                 </select>
                 
                 <select
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
+                  onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
                   className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
                     isDarkMode 
                       ? 'border-gray-600 bg-gray-700 text-white' 
@@ -527,70 +508,85 @@ const Providers = () => {
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
-              </div>
-
-              {/* View Toggle Buttons */}
               <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 justify-center sm:justify-start">
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="Table View"
+                  className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                     viewMode === "table"
                       ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                       : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
                     </svg>
-                    <span>Table</span>
+                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
                   </div>
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="List View"
+                  className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                     viewMode === "list"
                       ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                       : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
-                    <span>List</span>
+                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
                   </div>
                 </button>
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="Grid View"
+                  className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                     viewMode === "grid"
                       ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                       : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
-                    <span>Grid</span>
+                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
                   </div>
                 </button>
               </div>
-            </div>
+          <button
+            onClick={handleAddProvider}
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
+          >
+            <PlusIcon className="h-4 w-4 mr-2" />
+            New
+          </button>
           </div>
-        </div>
+</div>
 
-        {/* Conditional Views */}
+      {/* Filters and Search */}
+      <div className={`rounded-lg shadow-lg flex flex-col flex-1 min-h-0 overflow-hidden transition-all duration-300 ${
+        isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
+      }`}>
+        <div className="flex-1 min-h-0 overflow-auto">
         {viewMode === "table" && (
-          <div className="overflow-x-auto">
+          <div>
             <table className={`min-w-full divide-y transition-colors duration-300 ${
               isDarkMode ? 'divide-gray-700' : 'divide-gray-200'
             }`}>
-              <thead className={`transition-colors duration-300 ${
+              <thead className={`sticky top-0 z-10 transition-colors duration-300 ${
                 isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
               }`}>
                 <tr>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-500'
+                  }`}>
+                    S.No.
+                  </th>
                   <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
@@ -628,7 +624,7 @@ const Providers = () => {
               }`}>
                 {filteredProviders.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center">
+                    <td colSpan="7" className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center space-y-3">
                         <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors duration-300 ${
                           isDarkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-100 text-gray-400'
@@ -652,10 +648,11 @@ const Providers = () => {
                     </td>
                   </tr>
                 ) : (
-                filteredProviders.map((provider) => (
+                filteredProviders.map((provider, index) => (
                   <tr key={provider._id} className={`transition-colors duration-300 ${
                     isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                   }`}>
+<td className="px-6 py-4 whitespace-nowrap">{(currentPage - 1) * 10 + index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className={`h-10 w-10 rounded-full flex items-center justify-center transition-colors duration-300 ${
@@ -807,11 +804,11 @@ const Providers = () => {
                         className={`h-12 w-12 rounded-full flex items-center justify-center transition-colors duration-300 ${
                           isDarkMode ? "bg-gray-600" : "bg-gray-300"
                         }`}
-                        style={{ backgroundColor: provider.specialization?.color + '20' }}
+                        style={{ backgroundColor: provider.specializations?.[0]?.color + '20' }}
                       >
                         <UserIcon
                           className={`h-6 w-6 transition-colors duration-300`}
-                          style={{ color: provider.specialization?.color }}
+                          style={{ color: provider.specializations?.[0]?.color }}
                         />
                       </div>
                       <div>
@@ -823,7 +820,7 @@ const Providers = () => {
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
                         }`}>
-                          {provider.specialization?.name || 'No Specialization'}
+                          {provider.specializations?.[0]?.name || 'No Specialization'}
                         </div>
                         <div className={`text-xs transition-colors duration-300 ${
                           isDarkMode ? "text-gray-400" : "text-gray-400"
@@ -924,11 +921,11 @@ const Providers = () => {
                       className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-3 transition-colors duration-300 ${
                         isDarkMode ? "bg-gray-600" : "bg-gray-300"
                       }`}
-                      style={{ backgroundColor: provider.specialization?.color + '20' }}
+                      style={{ backgroundColor: provider.specializations?.[0]?.color + '20' }}
                     >
                       <UserIcon
                         className={`h-8 w-8 transition-colors duration-300`}
-                        style={{ color: provider.specialization?.color }}
+                        style={{ color: provider.specializations?.[0]?.color }}
                       />
                     </div>
                     <div className={`text-lg font-medium transition-colors duration-300 ${
@@ -939,7 +936,7 @@ const Providers = () => {
                     <div className={`text-sm transition-colors duration-300 ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
-                      {provider.specialization?.name || 'No Specialization'}
+                      {provider.specializations?.[0]?.name || 'No Specialization'}
                     </div>
                     <div className={`text-xs transition-colors duration-300 ${
                       isDarkMode ? "text-gray-400" : "text-gray-400"
@@ -998,6 +995,8 @@ const Providers = () => {
           </div>
         )}
       </div>
+<Pagination currentPage={currentPage} totalPages={totalPages} totalItems={totalProviders} onPageChange={setCurrentPage} />
+</div>
 
       {/* Provider Details Modal */}
       {showProviderModal && selectedProvider && (
@@ -1441,75 +1440,6 @@ const Providers = () => {
         </div>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-          <div className="flex-1 flex justify-between sm:hidden">
-            <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
-          </div>
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Showing{' '}
-                <span className="font-medium">{(currentPage - 1) * 10 + 1}</span>
-                {' '}to{' '}
-                <span className="font-medium">
-                  {Math.min(currentPage * 10, totalProviders)}
-                </span>
-                {' '}of{' '}
-                <span className="font-medium">{totalProviders}</span>
-                {' '}results
-              </p>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i + 1}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                      currentPage === i + 1
-                        ? 'z-10 bg-custom-btnBg/10 border-custom-btnBg text-custom-btnBg'
-                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              </nav>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

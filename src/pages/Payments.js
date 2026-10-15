@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import { ListPageSkeleton } from '../components/Skeleton';
 import callAPI from '../services/callAPI';
 import { 
   MagnifyingGlassIcon, 
@@ -14,11 +15,13 @@ import {
   BanknotesIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
+import Pagination from '../components/Pagination';
 
 const Payments = () => {
   const { isDarkMode } = useTheme();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totals, setTotals] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -267,49 +270,39 @@ const fetchPayments = async () => {
       .reduce((acc, p) => acc + toSar((p.refundAmount || p.amount || 0), p.currency), 0);
   };
 
+  // Back to the first page whenever search/filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, filterMethod]);
+
+  const PAGE_SIZE = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredPayments.length / PAGE_SIZE));
+  const paginated = filteredPayments.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className={`animate-spin rounded-full h-12 w-12 border-b-2 transition-colors duration-300 ${
-          isDarkMode ? 'border-primary-400' : 'border-primary-600'
-        }`}></div>
-      </div>
-    );
+    return <ListPageSkeleton selects={2} addButton={false} columns={8} />;
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="mb-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className={`text-2xl font-bold transition-colors duration-300 ${
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>Payments Management</h1>
-            <p className={`transition-colors duration-300 ${
-              isDarkMode ? 'text-gray-300' : 'text-gray-600'
-            }`}>Manage all payment transactions in the system</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
+    <div className="animate-fade-in h-full flex flex-col">
+      <div className="mb-6 shrink-0 flex flex-wrap items-center justify-between gap-3">
+  <div className="flex flex-wrap gap-3">
+        <div className={`rounded-lg shadow-lg px-3 py-2 transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
         }`}>
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg transition-colors duration-300 ${
+            <div className={`p-1.5 rounded-lg transition-colors duration-300 ${
               isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'
             }`}>
-              <CurrencyDollarIcon className={`h-6 w-6 transition-colors duration-300 ${
+              <CurrencyDollarIcon className={`h-5 w-5 transition-colors duration-300 ${
                 isDarkMode ? 'text-blue-400' : 'text-blue-600'
               }`} />
             </div>
-            <div className="ml-4">
-              <p className={`text-sm font-medium transition-colors duration-300 ${
+            <div className="ml-3">
+              <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Total Revenue</p>
-              <p className={`text-2xl font-bold transition-colors duration-300 ${
+              <p className={`text-xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 {formatCurrency((totals?.totalAmountSar ?? fromCents(calculateTotalRevenue())), displayCurrency)}
@@ -318,22 +311,22 @@ const fetchPayments = async () => {
           </div>
         </div>
         
-        <div className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
+        <div className={`rounded-lg shadow-lg px-3 py-2 transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
         }`}>
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg transition-colors duration-300 ${
+            <div className={`p-1.5 rounded-lg transition-colors duration-300 ${
               isDarkMode ? 'bg-green-900/30' : 'bg-green-100'
             }`}>
-              <CheckCircleIcon className={`h-6 w-6 transition-colors duration-300 ${
+              <CheckCircleIcon className={`h-5 w-5 transition-colors duration-300 ${
                 isDarkMode ? 'text-green-400' : 'text-green-600'
               }`} />
             </div>
-            <div className="ml-4">
-              <p className={`text-sm font-medium transition-colors duration-300 ${
+            <div className="ml-3">
+              <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Completed Payments</p>
-              <p className={`text-2xl font-bold transition-colors duration-300 ${
+              <p className={`text-xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 {payments.filter(p => p.status === 'success').length}
@@ -342,22 +335,22 @@ const fetchPayments = async () => {
           </div>
         </div>
         
-        <div className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
+        <div className={`rounded-lg shadow-lg px-3 py-2 transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
         }`}>
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg transition-colors duration-300 ${
+            <div className={`p-1.5 rounded-lg transition-colors duration-300 ${
               isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'
             }`}>
-              <CurrencyDollarIcon className={`h-6 w-6 transition-colors duration-300 ${
+              <CurrencyDollarIcon className={`h-5 w-5 transition-colors duration-300 ${
                 isDarkMode ? 'text-purple-400' : 'text-purple-600'
               }`} />
             </div>
-            <div className="ml-4">
-              <p className={`text-sm font-medium transition-colors duration-300 ${
+            <div className="ml-3">
+              <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Total Fees</p>
-              <p className={`text-2xl font-bold transition-colors duration-300 ${
+              <p className={`text-xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 {formatCurrency(calculateTotalFeesSar(), displayCurrency)}
@@ -366,22 +359,22 @@ const fetchPayments = async () => {
           </div>
         </div>
         
-        <div className={`rounded-lg shadow-lg p-6 transition-all duration-300 hover:scale-105 ${
+        <div className={`rounded-lg shadow-lg px-3 py-2 transition-all duration-300 ${
           isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
         }`}>
           <div className="flex items-center">
-            <div className={`p-2 rounded-lg transition-colors duration-300 ${
+            <div className={`p-1.5 rounded-lg transition-colors duration-300 ${
               isDarkMode ? 'bg-red-900/30' : 'bg-red-100'
             }`}>
-              <ArrowPathIcon className={`h-6 w-6 transition-colors duration-300 ${
+              <ArrowPathIcon className={`h-5 w-5 transition-colors duration-300 ${
                 isDarkMode ? 'text-red-400' : 'text-red-600'
               }`} />
             </div>
-            <div className="ml-4">
-              <p className={`text-sm font-medium transition-colors duration-300 ${
+            <div className="ml-3">
+              <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Total Refunds</p>
-              <p className={`text-2xl font-bold transition-colors duration-300 ${
+              <p className={`text-xl font-bold transition-colors duration-300 ${
                 isDarkMode ? 'text-white' : 'text-gray-900'
               }`}>
                 {formatCurrency((totals?.statusTotals?.cancelled?.amountSar ?? calculateTotalRefundsSar()), displayCurrency)}
@@ -390,17 +383,8 @@ const fetchPayments = async () => {
           </div>
         </div>
       </div>
-
-      {/* Filters and Search */}
-      <div className={`rounded-lg shadow-lg mb-6 transition-all duration-300 ${
-        isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
-      }`}>
-        <div className={`p-6 border-b transition-colors duration-300 ${
-          isDarkMode ? 'border-gray-700' : 'border-gray-200'
-        }`}>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
+<div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
+<div className="relative w-full sm:w-56">
                 <MagnifyingGlassIcon className={`h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-400' : 'text-gray-400'
                 }`} />
@@ -416,10 +400,7 @@ const fetchPayments = async () => {
                   }`}
                 />
               </div>
-            </div>
-            
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-2">
+<div className="flex gap-2">
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
@@ -454,64 +435,69 @@ const fetchPayments = async () => {
                   <option value="google_pay">Google Pay</option>
                 </select>
               </div>
-
-              {/* View Toggle Buttons */}
-              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 justify-center sm:justify-start">
+<div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 justify-center sm:justify-start">
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="Table View"
+                  className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                     viewMode === "table"
                       ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                       : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
                     </svg>
-                    <span>Table</span>
+                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
                   </div>
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="List View"
+                  className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                     viewMode === "list"
                       ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                       : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
-                    <span>List</span>
+                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
                   </div>
                 </button>
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="Grid View"
+                  className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                     viewMode === "grid"
                       ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                       : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
-                    <span>Grid</span>
+                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
                   </div>
                 </button>
               </div>
-            </div>
-          </div>
-        </div>
+    </div>
+</div>
 
-        {/* Conditional Views */}
+      {/* Filters and Search */}
+      <div className={`rounded-lg shadow-lg flex flex-col flex-1 min-h-0 overflow-hidden transition-all duration-300 ${
+        isDarkMode ? 'bg-gray-800 border border-gray-700 shadow-gray-900/50' : 'bg-white shadow-gray-200/50'
+      }`}>
+
+        <div className="flex-1 min-h-0 overflow-auto">
         {viewMode === "table" && (
-        <div className="overflow-x-auto">
+        <div>
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className={`transition-colors duration-300 ${
+            <thead className={`sticky top-0 z-10 transition-colors duration-300 ${
               isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
             }`}>
               <tr>
@@ -581,12 +567,12 @@ const fetchPayments = async () => {
                   </td>
                 </tr>
               ) : (
-              filteredPayments.map((payment,index) => (
+              paginated.map((payment,index) => (
                 <tr key={payment._id} className={`transition-colors duration-300 ${
                   isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                 }`}>
                    <td className="px-6 py-4 whitespace-nowrap">
-                    {index + 1}
+                    {(currentPage - 1) * PAGE_SIZE + index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="space-y-1">
@@ -704,7 +690,7 @@ const fetchPayments = async () => {
                 </p>
               </div>
             ) : (
-              filteredPayments.map((payment) => (
+              paginated.map((payment) => (
                 <div
                   key={payment._id}
                   className={`p-4 rounded-lg border transition-all duration-300 ${
@@ -810,7 +796,7 @@ const fetchPayments = async () => {
                 </p>
               </div>
             ) : (
-              filteredPayments.map((payment) => (
+              paginated.map((payment) => (
                 <div
                   key={payment._id}
                   className={`p-4 rounded-lg border transition-all duration-300 ${
@@ -887,6 +873,8 @@ const fetchPayments = async () => {
           </div>
         )}
       </div>
+<Pagination currentPage={currentPage} totalPages={totalPages} totalItems={filteredPayments.length} onPageChange={setCurrentPage} />
+</div>
 
       {/* Payment Details Modal */}
       {showPaymentModal && selectedPayment && (

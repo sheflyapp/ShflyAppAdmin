@@ -13,6 +13,8 @@ import {
   TagIcon,
 } from "@heroicons/react/24/outline";
 import { toast } from "react-hot-toast";
+import { TableSkeleton } from '../components/Skeleton';
+import Pagination from '../components/Pagination';
 
 const Questions = () => {
   const { isDarkMode } = useTheme();
@@ -187,51 +189,36 @@ const Questions = () => {
   };
 
   return (
-    <div className={`min-h-screen`}>
-      <div className="max-w-7xl mx-auto">
+    <div className="h-full flex flex-col">
+      <div className="max-w-7xl mx-auto w-full flex-1 min-h-0 flex flex-col">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className={`text-3xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                Questions Management
-              </h1>
-              <p className={`mt-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                Manage all user questions and answers
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
+        <div className="mb-6 shrink-0">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+<div className="flex items-center space-x-4">
               <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                 Total: {totalQuestions} questions
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Filters and Search */}
-        <div className={`mb-6 p-6 rounded-lg ${isDarkMode ? "bg-gray-800" : "bg-white"} shadow`}>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div className="relative">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
+<div className="relative w-full sm:w-56">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search questions..."
                 value={searchTerm}
                 onChange={handleSearch}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                     : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
                 }`}
               />
             </div>
-
-            {/* Status Filter */}
-            <select
+<select
               value={filterStatus}
               onChange={(e) => handleStatusFilter(e.target.value)}
-              className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                 isDarkMode
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-300 text-gray-900"
@@ -243,11 +230,11 @@ const Questions = () => {
               <option value="closed">Closed</option>
             </select>
 
-            {/* Priority Filter */}
+            
             <select
               value={filterPriority}
               onChange={(e) => handlePriorityFilter(e.target.value)}
-              className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                 isDarkMode
                   ? "bg-gray-700 border-gray-600 text-white"
                   : "bg-white border-gray-300 text-gray-900"
@@ -260,26 +247,23 @@ const Questions = () => {
               <option value="low">Low</option>
             </select>
 
-            {/* Refresh Button */}
+            
             <button
               onClick={() => fetchQuestions(currentPage, searchTerm, filterStatus, filterPriority)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                isDarkMode
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              }`}
+              className="px-4 py-2 rounded-lg font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
             >
               Refresh
             </button>
+
+            </div>
           </div>
         </div>
 
         {/* Questions Table */}
-        <div className={`rounded-lg shadow overflow-hidden ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+        <div className={`rounded-lg shadow overflow-hidden flex flex-col flex-1 min-h-0 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+<div className="flex-1 min-h-0 overflow-auto">
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
+            <TableSkeleton columns={6} rows={8} />
           ) : questions.length === 0 ? (
             <div className="text-center py-12">
               <ChatBubbleLeftRightIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -291,11 +275,16 @@ const Questions = () => {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div>
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className={`${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
+                <thead className={`sticky top-0 z-10 ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                   <tr>
                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}>
+                    S.No.
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                       Question
@@ -333,8 +322,9 @@ const Questions = () => {
                   </tr>
                 </thead>
                 <tbody className={`${isDarkMode ? "bg-gray-800 divide-gray-700" : "bg-white divide-gray-200"}`}>
-                  {questions.map((question) => (
+                  {questions.map((question, index) => (
                     <tr key={question._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+<td className="px-6 py-4 whitespace-nowrap">{(currentPage - 1) * 10 + index + 1}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-start">
                           <div className="flex-shrink-0">
@@ -474,43 +464,9 @@ const Questions = () => {
             </div>
           )}
         </div>
+<Pagination currentPage={currentPage} totalPages={totalPages} totalItems={totalQuestions} onPageChange={setCurrentPage} />
+</div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="mt-6 flex items-center justify-between">
-            <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-700"}`}>
-              Showing page {currentPage} of {totalPages}
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === 1
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-600"
-                    : isDarkMode
-                    ? "bg-gray-700 text-white hover:bg-gray-600"
-                    : "bg-white text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === totalPages
-                    ? "bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-600"
-                    : isDarkMode
-                    ? "bg-gray-700 text-white hover:bg-gray-600"
-                    : "bg-white text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Question Details Modal */}
         {showQuestionModal && selectedQuestion && (

@@ -294,7 +294,7 @@ const Layout = () => {
       </div>
 
       {/* Main content */}
-      <div className={`main-content transition-all duration-500 ease-in-out ${
+      <div className={`main-content h-screen flex flex-col transition-all duration-500 ease-in-out ${
         currentLanguage === 'ar' 
           ? (sidebarCollapsed ? 'lg:pr-16' : 'lg:pr-64')
           : (sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64')
@@ -332,6 +332,18 @@ const Layout = () => {
               <XMarkIcon className="h-6 w-6" />
             )}
           </button>
+
+          {/* Current page name (same label as the sidebar item) */}
+          {navigation.find((item) => isActive(item.href)) && (
+            <h1
+              className={`text-lg font-semibold transition-colors duration-300 ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}
+              style={{ paddingInlineStart: '10px' }}
+            >
+              {navigation.find((item) => isActive(item.href)).name}
+            </h1>
+          )}
 
           <div className={`flex flex-1 gap-x-4 self-stretch lg:gap-x-6 ${
             currentLanguage === 'ar' ? 'flex-row-reverse' : 'flex-row'
@@ -476,7 +488,7 @@ const Layout = () => {
         </div>
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="flex-1 min-h-0 overflow-y-auto p-6">
             <Outlet />
         </main>
       </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import callAPI from '../services/callAPI';
 import { useTheme } from '../contexts/ThemeContext';
+import { DashboardSkeleton } from '../components/Skeleton';
 import { useTranslation } from 'react-i18next';
 import {
   UsersIcon,
@@ -216,47 +217,29 @@ const Dashboard = () => {
   const chartData = charts;
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className={`animate-spin rounded-full h-32 w-32 border-b-2 transition-colors duration-300 ${
-          isDarkMode ? 'border-primary-400' : 'border-primary-600'
-        }`}></div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Page header */}
-      <div>
-        <h1 className={`text-2xl font-semibold transition-colors duration-300 ${
-          isDarkMode ? 'text-white' : 'text-gray-900'
-        }`}>{t('dashboard.title')}</h1>
-        <p className={`mt-1 text-sm transition-colors duration-300 ${
-          isDarkMode ? 'text-gray-300' : 'text-gray-500'
-        }`}>
-          {t('dashboard.welcome')}
-        </p>
-      </div>
-
       {/* Stats cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-5">
         {statCards.map((stat) => (
           <div 
             key={stat.name} 
             onClick={() => navigate(stat.link)}
             title={`Click to view ${stat.name.toLowerCase()}`}
-            className={`card transition-all duration-300 hover:scale-105 cursor-pointer ${
+            className={`card p-4 transition-all duration-300 cursor-pointer ${
               isDarkMode 
                 ? 'bg-gray-800 border-gray-700 shadow-gray-900/50 hover:bg-gray-700 hover:border-gray-600' 
                 : 'bg-white border-gray-200 shadow-gray-200/50 hover:bg-gray-50 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center">
-              <div className={`flex-shrink-0 p-3 rounded-md ${stat.color}`}>
-                <stat.icon className="h-6 w-6 text-white" />
+              <div className={`flex-shrink-0 p-2 rounded-md ${stat.color}`}>
+                <stat.icon className="h-5 w-5 text-white" />
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="ml-3 w-0 flex-1">
                 <dl>
                   <dt className={`text-sm font-medium truncate transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-500'
@@ -271,8 +254,8 @@ const Dashboard = () => {
                 </dl>
               </div>
             </div>
-            <div className="mt-4">
-              <div className="flex items-center text-sm">
+            <div className="mt-2">
+              <div className="flex items-center text-xs">
                 {stat.changeType === 'positive' ? (
                   <ArrowTrendingUpIcon className="h-4 w-4 text-green-400" />
                 ) : (
@@ -287,14 +270,6 @@ const Dashboard = () => {
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 }`}>from last month</span>
               </div>
-              {/* Click indicator */}
-              <div className="mt-2 flex items-center justify-end">
-                <span className={`text-xs font-medium transition-colors duration-300 ${
-                  isDarkMode ? 'text-blue-400' : 'text-blue-600'
-                }`}>
-                  Click to view details →
-                </span>
-              </div>
             </div>
           </div>
         ))}
@@ -303,7 +278,7 @@ const Dashboard = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Users and Consultations Chart */}
-        <div className={`card transition-all duration-300 hover:scale-105 ${
+        <div className={`card transition-all duration-300 ${
           isDarkMode 
             ? 'bg-gray-800 border-gray-700 shadow-gray-900/50' 
             : 'bg-white border-gray-200 shadow-gray-200/50'
@@ -330,7 +305,7 @@ const Dashboard = () => {
         </div>
 
         {/* Revenue Chart */}
-        <div className={`card transition-all duration-300 hover:scale-105 ${
+        <div className={`card transition-all duration-300 ${
           isDarkMode 
             ? 'bg-gray-800 border-gray-700 shadow-gray-900/50' 
             : 'bg-white border-gray-200 shadow-gray-200/50'
@@ -357,12 +332,12 @@ const Dashboard = () => {
       </div>
 
       {/* Recent Consultations */}
-      <div className={`card transition-all duration-300 hover:scale-105 ${
+      <div className={`card transition-all duration-300 ${
         isDarkMode 
           ? 'bg-gray-800 border-gray-700 shadow-gray-900/50' 
           : 'bg-white border-gray-200 shadow-gray-200/50'
       }`}>
-        <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <h3 className={`text-lg font-medium transition-colors duration-300 ${
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>Recent Questions</h3>
@@ -371,47 +346,50 @@ const Dashboard = () => {
           <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 justify-center sm:justify-start">
             <button
               onClick={() => setViewMode("table")}
-              className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="Table View"
+              className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                 viewMode === "table"
                   ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
                 </svg>
-                <span>Table</span>
+                <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
               </div>
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="List View"
+              className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                 viewMode === "list"
                   ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                 </svg>
-                <span>List</span>
+                <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
               </div>
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
+                  aria-label="Grid View"
+              className={`group relative px-3 py-1 text-sm font-medium rounded-md transition-all duration-200 ${
                 viewMode === "grid"
                   ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
                   : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
-                <span>Grid</span>
+                <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
               </div>
             </button>
           </div>
@@ -419,13 +397,18 @@ const Dashboard = () => {
         
         {/* Conditional Views */}
         {viewMode === "table" && (
-        <div className="overflow-x-auto">
+        <div className="max-h-96 overflow-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className={`transition-colors duration-300 ${
+            <thead className={`sticky top-0 z-10 transition-colors duration-300 ${
               isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
             }`}>
               <tr>
                 <th className={`table-header transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-200' : 'text-gray-500'
+                }`}>
+                    S.No.
+                  </th>
+                  <th className={`table-header transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-500'
                 }`}>Posted By</th>
                 <th className={`table-header transition-colors duration-300 ${
@@ -452,8 +435,11 @@ const Dashboard = () => {
               isDarkMode ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200'
             }`}>
               {recentQuestions.length > 0 ? (
-                recentQuestions.map((q) => (
+                recentQuestions.map((q, index) => (
                   <tr key={q._id}>
+<td className={`table-cell transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                    }`}>{index + 1}</td>
                     <td className={`table-cell transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-200' : 'text-gray-900'
                     }`}>
@@ -529,7 +515,7 @@ const Dashboard = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" className={`px-6 py-4 text-center transition-colors duration-300 ${
+                  <td colSpan="8" className={`px-6 py-4 text-center transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                   }`}>
                     No questions found

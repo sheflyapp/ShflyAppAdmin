@@ -22,6 +22,7 @@ import {
   GlobeAltIcon,
   DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline';
+import { RowsSkeleton } from '../components/Skeleton';
 
 const StaticContent = () => {
   const { t } = useTranslation();
@@ -484,16 +485,6 @@ const StaticContent = () => {
   return (
     <div className={`min-h-screen`}>
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            {t('staticContent.title')}
-          </h1>
-          <p className={`mt-2 text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            {t('staticContent.subtitle')}
-          </p>
-        </div>
-
         {/* Content Types Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {contentTypes.map((type) => {
@@ -569,12 +560,7 @@ const StaticContent = () => {
           </div>
           
           {isLoading ? (
-            <div className="p-6 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
-              <p className={`mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {t('common.loading')}
-              </p>
-            </div>
+            <RowsSkeleton rows={4} />
           ) : contentList.length === 0 ? (
             <div className="p-6 text-center">
               <DocumentDuplicateIcon className={`h-12 w-12 mx-auto mb-4 ${
@@ -588,11 +574,16 @@ const StaticContent = () => {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="max-h-[28rem] overflow-auto">
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+                <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-700">
                   <tr>
                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                    }`}>
+                    S.No.
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                       {t('staticContent.type')}
@@ -625,12 +616,13 @@ const StaticContent = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {contentList.map((content) => {
+                  {contentList.map((content, index) => {
                     const typeInfo = getContentTypeInfo(content.type);
                     const Icon = typeInfo.icon;
                     
                     return (
                       <tr key={content._id}>
+<td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <Icon className={`h-5 w-5 mr-3 ${
