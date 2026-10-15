@@ -374,7 +374,7 @@ const Questions = () => {
                             <div className={`text-sm font-medium ${
                               isDarkMode ? "text-white" : "text-gray-900"
                             }`}>
-                              {question.userId?.fullname || "Unknown User"}
+                              {question.userId?.fullname || question.userId?.username || "Unknown User"}
                             </div>
                             <div className={`text-sm ${
                               isDarkMode ? "text-gray-400" : "text-gray-500"
@@ -558,7 +558,7 @@ const Questions = () => {
                             Name:
                           </span>
                           <p className={`text-sm ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                            {selectedQuestion.userId?.fullname || "Unknown User"}
+                            {selectedQuestion.userId?.fullname || selectedQuestion.userId?.username || "Unknown User"}
                           </p>
                         </div>
                         <div>

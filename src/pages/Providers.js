@@ -121,7 +121,7 @@ const Providers = () => {
   const handleToggleActive = async (providerId) => {
     try {
       const provider = providers.find(p => p._id === providerId);
-      const response = await callAPI.put(`/api/admin/users/${providerId}/status`, {
+      const response = await callAPI.patch(`/api/admin/users/${providerId}/status`, {
         isActive: !provider.isActive
       });
       
@@ -136,6 +136,22 @@ const Providers = () => {
     } catch (error) {
       console.error('Error updating provider status:', error);
       toast.error('Failed to update provider status');
+    }
+  };
+
+  const handleVerifyProvider = async (providerId, isVerified) => {
+    try {
+      const response = await callAPI.patch(`/api/admin/users/${providerId}/status`, { isVerified });
+
+      if (response.data.success) {
+        setProviders(providers.map(provider =>
+          provider._id === providerId ? { ...provider, isVerified } : provider
+        ));
+        toast.success(isVerified ? 'Provider approved successfully' : 'Provider approval removed');
+      }
+    } catch (error) {
+      console.error('Error updating provider approval:', error);
+      toast.error('Failed to update provider approval');
     }
   };
 
@@ -249,7 +265,7 @@ const Providers = () => {
         <span className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
           isDarkMode ? 'bg-yellow-900/30 text-yellow-200' : 'bg-yellow-100 text-yellow-800'
         }`}>
-          Unverified
+          Pending Approval
         </span>
       );
     }
@@ -727,6 +743,15 @@ const Providers = () => {
                           {provider.isActive ? <XCircleIcon className="h-5 w-5" /> : <CheckCircleIcon className="h-5 w-5" />}
                         </button>
                         
+                        {!provider.isVerified && (
+                          <button
+                            onClick={() => handleVerifyProvider(provider._id, true)}
+                            className="px-2 py-1 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                            title="Approve Provider"
+                          >
+                            Approve
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDeleteProvider(provider._id)}
                           className="text-red-600 hover:text-red-800 transition-colors duration-200"
@@ -837,6 +862,15 @@ const Providers = () => {
                         >
                           <PencilSquareIcon className="h-5 w-5" />
                         </button>
+                        {!provider.isVerified && (
+                          <button
+                            onClick={() => handleVerifyProvider(provider._id, true)}
+                            className="px-2 py-1 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                            title="Approve Provider"
+                          >
+                            Approve
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDeleteProvider(provider._id)}
                           className="text-red-600 hover:text-red-800 transition-colors duration-200"
@@ -941,6 +975,15 @@ const Providers = () => {
                     >
                       <PencilSquareIcon className="h-5 w-5" />
                     </button>
+                    {!provider.isVerified && (
+                      <button
+                        onClick={() => handleVerifyProvider(provider._id, true)}
+                        className="px-2 py-1 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700 transition-colors duration-200"
+                        title="Approve Provider"
+                      >
+                        Approve
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDeleteProvider(provider._id)}
                       className="text-red-600 hover:text-red-800 transition-colors duration-200"
