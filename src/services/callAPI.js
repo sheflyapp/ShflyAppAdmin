@@ -31,11 +31,19 @@ callAPI.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid
       localStorage.removeItem('adminToken');
       window.location.href = '/login';
+    }
+    const config = error.config;
+    if (error.response?.status === 429 && config && !config._retried) {
+      // Rate limited: wait for Retry-After (capped at 30s) and retry once
+      config._retried = true;
+      const retryAfter = Number(error.response.headers?.['retry-after']) || 1;
+      await new Promise((resolve) => setTimeout(resolve, Math.min(retryAfter, 30) * 1000));
+      return callAPI(config);
     }
     return Promise.reject(error);
   }
