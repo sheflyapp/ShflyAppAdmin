@@ -82,13 +82,19 @@
     "systemHealth": "System Health"
   },
   "auth": {
-    "loginTitle": "Admin Login",
-    "loginSubtitle": "Enter credentials to access admin panel",
-    "forgotPassword": "Forgot Password?",
-    "rememberMe": "Remember Me",
-    "invalidCredentials": "Invalid email or password",
-    "loginSuccess": "Login successful",
-    "logoutSuccess": "Logout successful"
+    "loginTitle": "تسجيل دخول المشرف",
+    "loginSubtitle": "أدخل بيانات الدخول للوصول إلى لوحة التحكم",
+    "welcomeBack": "مرحبًا بعودتك",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "rememberMe": "تذكرني",
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
+    "logoutSuccess": "تم تسجيل الخروج بنجاح",
+    "fillAllFields": "يرجى ملء جميع الحقول",
+    "loginFailed": "فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.",
+    "adminOnly": "هذه البوابة مخصصة للمشرفين فقط. على المستخدمين العاديين استخدام تطبيق الجوال.",
+    "heroTitle": "أدِر منصة الاستشارات بثقة",
+    "heroSubtitle": "أدِر مقدمي الخدمة والباحثين والاستشارات والمدفوعات من مكان واحد."
   },
   "users": {
     "title": "User Management",

@@ -1,285 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ------------------------------------------------------------------ */
+/* Theme tokens (space-separated RGB so Tailwind opacity modifiers work) */
+/* ------------------------------------------------------------------ */
+:root {
+  --app: 250 247 246;
+  --surface: 255 255 255;
+  --surface-2: 247 244 243;
+  --line: 233 228 226;
+  --fg: 28 25 23;
+  --muted: 120 113 108;
+  --brand: 253 106 58;
+  --brand-soft: 255 237 230;
+  --brand-fg: 255 255 255;
+  --shadow: 41 37 36;
+  color-scheme: light;
+}
+
+:root.dark {
+  --app: 18 18 20;
+  --surface: 28 28 31;
+  --surface-2: 38 38 42;
+  --line: 52 52 58;
+  --fg: 245 245 244;
+  --muted: 161 161 170;
+  --brand: 255 122 77;
+  --brand-soft: 58 32 24;
+  --brand-fg: 255 255 255;
+  --shadow: 0 0 0;
+  color-scheme: dark;
+}
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  
+
+  /* Arabic reads better in a dedicated face */
+  html[dir='rtl'] {
+    font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+  }
+
   body {
-    @apply transition-colors duration-300;
+    @apply bg-app text-fg transition-colors duration-300;
   }
-  
-  body.dark {
-    @apply bg-custom-dark text-white;
+
+  /* Keep the legacy body.dark hooks harmless: tokens now live on <html> */
+
+  ::selection {
+    background: rgb(var(--brand) / 0.25);
   }
-  
-  body:not(.dark) {
-    @apply bg-custom-light text-gray-900;
+
+  /* Slim scrollbars that follow the theme */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--muted) / 0.4) transparent;
   }
-  
-  /* RTL Support */
-  [dir="rtl"] {
-    direction: rtl;
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
-  
-  [dir="rtl"] .rtl-flip {
-    transform: scaleX(-1);
+  *::-webkit-scrollbar-thumb {
+    background: rgb(var(--muted) / 0.35);
+    border-radius: 999px;
   }
-  
-  [dir="rtl"] .rtl-mirror {
-    transform: scaleX(-1);
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--muted) / 0.55);
   }
-  
-  /* RTL Layout Adjustments */
-  [dir="rtl"] .main-content {
-    padding-left: 0 !important;
-  }
-  
-  [dir="rtl"] .sidebar-rtl {
-    right: 0;
-    left: auto;
-  }
-  
-  [dir="rtl"] .text-right {
-    text-align: left;
-  }
-  
-  [dir="rtl"] .text-left {
-    text-align: right;
-  }
-  
-  [dir="rtl"] .ml-auto {
-    margin-left: 0;
-    margin-right: auto;
-  }
-  
-  [dir="rtl"] .mr-auto {
-    margin-right: 0;
-    margin-left: auto;
-  }
-  
-  /* RTL Sidebar Transitions */
-  [dir="rtl"] .sidebar-rtl {
-    transition: all 0.5s ease-in-out;
-  }
-  
-  /* RTL Content Padding - Force proper padding */
-  [dir="rtl"] .main-content.lg\\:pr-16 {
-    padding-right: 4rem !important;
-  }
-  
-  [dir="rtl"] .main-content.lg\\:pr-64 {
-    padding-right: 16rem !important;
-  }
-  
-  /* Ensure LTR content has proper padding */
-  [dir="ltr"] .main-content.lg\\:pl-16 {
-    padding-left: 4rem !important;
-  }
-  
-  [dir="ltr"] .main-content.lg\\:pl-64 {
-    padding-left: 16rem !important;
-  }
-  
-  /* RTL Specific Layout Fixes */
-  [dir="rtl"] .lg\\:pl-16,
-  [dir="rtl"] .lg\\:pl-64 {
-    padding-left: 0 !important;
-  }
-  
-  [dir="rtl"] .lg\\:pr-16,
-  [dir="rtl"] .lg\\:pr-64 {
-    padding-right: 0 !important;
-  }
-  
-  /* Force RTL padding override */
-  [dir="rtl"] .main-content.lg\\:pr-16 {
-    padding-right: 4rem !important;
-    padding-left: 0 !important;
-  }
-  
-  [dir="rtl"] .main-content.lg\\:pr-64 {
-    padding-right: 16rem !important;
-    padding-left: 0 !important;
-  }
-  
-  /* RTL Sidebar Icon Spacing */
-  [dir="rtl"] .sidebar-rtl .ml-3 {
-    margin-left: 0 !important;
-    margin-right: 0.75rem !important;
-  }
-  
-  [dir="rtl"] .sidebar-rtl .ml-2 {
-    margin-left: 0 !important;
-    margin-right: 0.5rem !important;
-  }
-  
-  /* Ensure proper icon spacing in RTL */
-  [dir="rtl"] .sidebar-rtl nav .ml-3 {
-    margin-left: 0 !important;
-    margin-right: 0.75rem !important;
-  }
-  
-  [dir="rtl"] .sidebar-rtl .ml-2 {
-    margin-left: 0 !important;
-    margin-right: 0.5rem !important;
+
+  /* Numbers, emails and URLs stay left-to-right inside RTL text */
+  input[type='email'],
+  input[type='url'],
+  input[type='tel'],
+  input[type='number'] {
+    unicode-bidi: plaintext;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-custom-btnBg hover:bg-custom-btnBg/90 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-custom-btnBg focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 bg-brand text-brand-fg font-medium py-2.5 px-4 rounded-xl shadow-sm transition duration-200 hover:brightness-110 hover:shadow-glow active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-app disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none;
   }
-  
+
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 bg-surface-2 text-fg border border-line font-medium py-2.5 px-4 rounded-xl transition duration-200 hover:border-muted/50 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-app;
   }
-  
+
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-xl transition duration-200 active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-app;
   }
-  
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-xl p-2 text-muted transition duration-200 hover:bg-surface-2 hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand;
+  }
+
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply bg-surface text-fg rounded-2xl shadow-soft border border-line p-6 transition-colors duration-300;
   }
-  
+
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-btnBg focus:border-transparent;
+    @apply w-full px-3.5 py-2.5 bg-surface text-fg placeholder:text-muted/70 border border-line rounded-xl transition duration-200 focus:outline-none focus:ring-2 focus:ring-brand/40 focus:border-brand;
   }
-  
+
   .table-header {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+    @apply px-6 py-3 text-start text-xs font-semibold text-muted uppercase tracking-wider;
   }
-  
+
   .table-cell {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+    @apply px-6 py-4 whitespace-nowrap text-sm text-fg;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-brand-soft text-brand;
+  }
+
+  /* Mirror direction-bearing icons (chevrons, arrows) in RTL */
+  .rtl-flip {
+    @apply rtl:-scale-x-100;
   }
 }
 
-/* RTL Support */
-[dir="rtl"] {
-  /* Text alignment */
-  text-align: right;
+/* ------------------------------------------------------------------ */
+/* RTL                                                                 */
+/* Pages use logical utilities (ms-/me-/ps-/pe-/start-/end-/text-start) */
+/* so they mirror on their own. Tailwind's space-x-* is physical, so    */
+/* it is mirrored here.                                                 */
+/* ------------------------------------------------------------------ */
+[dir='rtl'] [class*='space-x-']:not([class*='space-x-reverse']) > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
 }
 
-[dir="rtl"] .text-left {
-  text-align: right;
+[dir='rtl'] input,
+[dir='rtl'] textarea,
+[dir='rtl'] select {
+  text-align: start;
 }
 
-[dir="rtl"] .text-right {
-  text-align: left;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-/* RTL specific spacing and positioning */
-[dir="rtl"] .space-x-1 > * + * {
-  margin-right: 0.25rem;
-  margin-left: 0;
+/* ------------------------------------------------------------------ */
+/* Drawer content: several legacy dialogs were written light-only      */
+/* (text-gray-900, bg-white ...). Map those to theme tokens so they    */
+/* stay readable in dark mode.                                         */
+/* ------------------------------------------------------------------ */
+.dark .drawer-body :is(.text-gray-900, .text-gray-800, .text-gray-700, .text-black) {
+  color: rgb(var(--fg));
+}
+.dark .drawer-body :is(.text-gray-600, .text-gray-500, .text-gray-400) {
+  color: rgb(var(--muted));
+}
+.dark .drawer-body :is(.bg-white, .bg-gray-50, .bg-gray-100) {
+  background-color: rgb(var(--surface-2));
+}
+.dark .drawer-body :is(.border-gray-100, .border-gray-200, .border-gray-300) {
+  border-color: rgb(var(--line));
+}
+.dark .drawer-body :is(input, select, textarea) {
+  background-color: rgb(var(--surface));
+  color: rgb(var(--fg));
+  border-color: rgb(var(--line));
 }
 
-[dir="rtl"] .space-x-2 > * + * {
-  margin-right: 0.5rem;
-  margin-left: 0;
+/* ------------------------------------------------------------------ */
+/* Tables: Actions column pinned to the end edge (right in LTR, left   */
+/* in RTL). It takes its background from the row so zebra/hover/dark   */
+/* all keep working, and a soft edge shows when content scrolls under. */
+/* ------------------------------------------------------------------ */
+table thead tr,
+table tbody tr {
+  background-color: inherit;
 }
 
-[dir="rtl"] .space-x-3 > * + * {
-  margin-right: 0.75rem;
-  margin-left: 0;
+.sticky-end-col {
+  position: sticky;
+  inset-inline-end: 0;
+  z-index: 5;
+  background-color: inherit;
 }
 
-[dir="rtl"] .space-x-4 > * + * {
-  margin-right: 1rem;
-  margin-left: 0;
+.sticky-end-col::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -10px;
+  width: 10px;
+  pointer-events: none;
+  background: linear-gradient(to right, transparent, rgb(var(--shadow) / 0.10));
 }
 
-[dir="rtl"] .space-x-6 > * + * {
-  margin-right: 1.5rem;
-  margin-left: 0;
+[dir='rtl'] .sticky-end-col::before {
+  background: linear-gradient(to left, transparent, rgb(var(--shadow) / 0.10));
 }
 
-[dir="rtl"] .space-x-8 > * + * {
-  margin-right: 2rem;
-  margin-left: 0;
+/* Never let action icons wrap onto a second line */
+.sticky-end-col > div {
+  flex-wrap: nowrap;
 }
 
-/* RTL specific padding and margins */
-[dir="rtl"] .pl-1 { padding-right: 0.25rem; padding-left: 0; }
-[dir="rtl"] .pl-2 { padding-right: 0.5rem; padding-left: 0; }
-[dir="rtl"] .pl-3 { padding-right: 0.75rem; padding-left: 0; }
-[dir="rtl"] .pl-4 { padding-right: 1rem; padding-left: 0; }
-[dir="rtl"] .pl-6 { padding-right: 1.5rem; padding-left: 0; }
-[dir="rtl"] .pl-8 { padding-right: 2rem; padding-left: 0; }
-
-[dir="rtl"] .pr-1 { padding-left: 0.25rem; padding-right: 0; }
-[dir="rtl"] .pr-2 { padding-left: 0.5rem; padding-right: 0; }
-[dir="rtl"] .pr-3 { padding-left: 0.75rem; padding-right: 0; }
-[dir="rtl"] .pr-4 { padding-left: 1rem; padding-right: 0; }
-[dir="rtl"] .pr-6 { padding-left: 1.5rem; padding-right: 0; }
-[dir="rtl"] .pr-8 { padding-left: 2rem; padding-right: 0; }
-
-[dir="rtl"] .ml-1 { margin-right: 0.25rem; margin-left: 0; }
-[dir="rtl"] .ml-2 { margin-right: 0.5rem; margin-left: 0; }
-[dir="rtl"] .ml-3 { margin-right: 0.75rem; margin-left: 0; }
-[dir="rtl"] .ml-4 { margin-right: 1rem; margin-left: 0; }
-[dir="rtl"] .ml-6 { margin-right: 1.5rem; margin-left: 0; }
-[dir="rtl"] .ml-8 { margin-right: 2rem; margin-left: 0; }
-
-[dir="rtl"] .mr-1 { margin-left: 0.25rem; margin-right: 0; }
-[dir="rtl"] .mr-2 { margin-left: 0.5rem; margin-right: 0; }
-[dir="rtl"] .mr-3 { margin-left: 0.75rem; margin-right: 0; }
-[dir="rtl"] .mr-4 { margin-left: 1rem; margin-right: 0; }
-[dir="rtl"] .mr-6 { margin-left: 1.5rem; margin-right: 0; }
-[dir="rtl"] .mr-8 { margin-left: 2rem; margin-right: 0; }
-
-/* RTL specific positioning */
-[dir="rtl"] .left-0 { right: 0; left: auto; }
-[dir="rtl"] .right-0 { left: 0; right: auto; }
-
-/* RTL specific flexbox */
-[dir="rtl"] .flex-row-reverse {
-  flex-direction: row-reverse;
+/* ------------------------------------------------------------------ */
+/* Drawer width: everything to the right of the sidebar, max 1440px.   */
+/* Below lg the sidebar is a hidden drawer, so the panel is full screen.*/
+/* ------------------------------------------------------------------ */
+@media (min-width: 1024px) {
+  .drawer-panel {
+    width: min(calc(100% - var(--sidebar-w, 256px)), 1440px);
+  }
 }
 
-/* RTL specific transforms */
-[dir="rtl"] .rotate-180 {
-  transform: rotate(180deg);
+/* ------------------------------------------------------------------ */
+/* Responsive field grid for drawers (forms and detail views).         */
+/* Columns follow the drawer's own width, not the viewport: as many as  */
+/* fit at --col-min, never more than --max-cols (default 4). Use col-span-full for wide      */
+/* fields. .auto-grid-sm is the denser variant for read-only details.   */
+/* ------------------------------------------------------------------ */
+.auto-grid {
+  --col-min: 220px;
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(
+      max(var(--col-min), calc((100% - (var(--max-cols, 4) - 1) * 1rem) / var(--max-cols, 4))),
+      1fr
+    )
+  );
 }
 
-/* Smooth transitions for language switching */
-* {
-  transition: text-align 0.3s ease, direction 0.3s ease;
+.auto-grid-sm {
+  --col-min: 130px;
 }
 
-/* RTL specific font adjustments */
-[dir="rtl"] {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+:root {
+  --drawer-footer-h: 4.5rem;
 }
-
-/* RTL specific input and form elements */
-[dir="rtl"] input,
-[dir="rtl"] textarea,
-[dir="rtl"] select {
-  text-align: right;
-}
-
-/* RTL specific table alignment */
-[dir="rtl"] th,
-[dir="rtl"] td {
-  text-align: right;
-}
-
-/* RTL specific button and icon positioning */
-[dir="rtl"] .icon-left {
-  margin-right: 0;
-  margin-left: 0.5rem;
-}
-
-[dir="rtl"] .icon-right {
-  margin-left: 0;
-  margin-right: 0.5rem;
-}
-
-

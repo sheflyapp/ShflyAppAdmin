@@ -93,7 +93,7 @@ export const RowsSkeleton = ({ rows = 4 }) => {
             <Bone className="h-4 w-1/3" />
             <Bone className="h-3 w-2/3" />
           </div>
-          <div className="flex gap-2 ml-6">
+          <div className="flex gap-2 ms-6">
             <Bone className="h-6 w-6" />
             <Bone className="h-6 w-6" />
           </div>
@@ -109,7 +109,7 @@ const StatCardSkeleton = () => {
     <div className={`${card} px-3 py-2 min-w-[140px]`}>
       <div className="flex items-center">
         <Bone className="h-8 w-8 rounded-lg flex-shrink-0" />
-        <div className="ml-3 flex-1 space-y-2">
+        <div className="ms-3 flex-1 space-y-2">
           <Bone className="h-3 w-20" />
           <Bone className="h-4 w-10" />
         </div>
@@ -169,7 +169,7 @@ export const DashboardSkeleton = () => {
           <div key={i} className={`${card} p-4`}>
             <div className="flex items-center">
               <Bone className="h-9 w-9 rounded-md flex-shrink-0" />
-              <div className="ml-3 flex-1 space-y-2">
+              <div className="ms-3 flex-1 space-y-2">
                 <Bone className="h-3 w-20" />
                 <Bone className="h-5 w-12" />
               </div>
@@ -208,7 +208,7 @@ export const AppSkeleton = () => {
   return (
     <div className={`min-h-screen flex ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <aside
-        className={`hidden lg:block w-64 flex-shrink-0 p-4 space-y-3 border-r ${
+        className={`hidden lg:block w-64 flex-shrink-0 p-4 space-y-3 border-e ${
           isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
         }`}
       >

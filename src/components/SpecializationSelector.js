@@ -103,7 +103,7 @@ const SpecializationSelector = ({
                 <button
                   type="button"
                   onClick={() => handleRemoveSpecialization(specialization._id)}
-                  className={`ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full transition-colors duration-300 ${
+                  className={`ms-2 inline-flex items-center justify-center w-4 h-4 rounded-full transition-colors duration-300 ${
                     isDarkMode 
                       ? 'hover:bg-blue-500' 
                       : 'hover:bg-blue-200'
@@ -123,7 +123,7 @@ const SpecializationSelector = ({
           type="button"
           onClick={() => setShowDropdown(!showDropdown)}
           disabled={disabled}
-          className={`w-full px-3 py-2 text-left border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+          className={`w-full px-3 py-2 text-start border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
             isDarkMode 
               ? 'border-gray-600 bg-gray-700 text-white' 
               : 'border-gray-300 bg-white text-gray-900'
@@ -169,7 +169,7 @@ const SpecializationSelector = ({
                     key={category._id}
                     type="button"
                     onClick={() => handleCategorySelect(category)}
-                    className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 flex items-center justify-between ${
+                    className={`w-full px-3 py-2 text-start text-sm hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 flex items-center justify-between ${
                       isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}
                   >

@@ -14,6 +14,8 @@ import {
 import { toast } from "react-hot-toast";
 import { ListPageSkeleton } from '../components/Skeleton';
 import Pagination from '../components/Pagination';
+import Drawer from '../components/Drawer';
+import { DetailSection, DetailField, formatDate } from '../components/DetailView';
 
 const CategoriesManagement = () => {
   const { isDarkMode } = useTheme();
@@ -280,7 +282,7 @@ const CategoriesManagement = () => {
                 }`}
               />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p
                 className={`text-xs font-medium transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-gray-600"
@@ -318,7 +320,7 @@ const CategoriesManagement = () => {
                 }`}
               />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p
                 className={`text-xs font-medium transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-gray-600"
@@ -356,7 +358,7 @@ const CategoriesManagement = () => {
                 }`}
               />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p
                 className={`text-xs font-medium transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-gray-600"
@@ -394,7 +396,7 @@ const CategoriesManagement = () => {
                 }`}
               />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p
                 className={`text-xs font-medium transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-gray-600"
@@ -416,7 +418,7 @@ const CategoriesManagement = () => {
 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
 <div className="relative w-full sm:w-56">
                 <MagnifyingGlassIcon
-                  className={`h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+                  className={`h-5 w-5 absolute start-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                     isDarkMode ? "text-gray-400" : "text-gray-400"
                   }`}
                 />
@@ -425,7 +427,7 @@ const CategoriesManagement = () => {
                   placeholder="Search categories..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                  className={`w-full ps-10 pe-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
                     isDarkMode
                       ? "border-gray-600 bg-gray-700 text-white placeholder-gray-400"
                       : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
@@ -442,7 +444,7 @@ const CategoriesManagement = () => {
                 />
                 <label
                   htmlFor="parentOnly"
-                  className={`ml-2 text-sm transition-colors duration-300 ${
+                  className={`ms-2 text-sm transition-colors duration-300 ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
@@ -463,7 +465,7 @@ const CategoriesManagement = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
                   </div>
                 </button>
                 <button
@@ -479,7 +481,7 @@ const CategoriesManagement = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
                   </div>
                 </button>
                 <button
@@ -495,7 +497,7 @@ const CategoriesManagement = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
                   </div>
                 </button>
               </div>
@@ -503,7 +505,7 @@ const CategoriesManagement = () => {
             onClick={handleCreateCategory}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
           >
-            <PlusIcon className="h-4 w-4 mr-2" />
+            <PlusIcon className="h-4 w-4 me-2" />
             New
           </button>
     </div>
@@ -529,49 +531,49 @@ const CategoriesManagement = () => {
             >
               <tr>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
                     S.No.
                   </th>
                   <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
                   Category
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
                   Type
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
                   Parent
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
                   Status
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
                   Order
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  className={`sticky-end-col px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? "text-gray-300" : "text-gray-500"
                   }`}
                 >
@@ -599,7 +601,7 @@ const CategoriesManagement = () => {
                       <div className="flex-shrink-0">
                         {getCategoryIcon(category)}
                       </div>
-                      <div className="ml-4">
+                      <div className="ms-4">
                         <div
                           className={`text-sm font-medium transition-colors duration-300 ${
                             isDarkMode ? "text-white" : "text-gray-900"
@@ -651,7 +653,7 @@ const CategoriesManagement = () => {
                   >
                     {category.sortOrder}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="sticky-end-col px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleViewCategory(category)}
@@ -761,7 +763,7 @@ const CategoriesManagement = () => {
                       </div>
                     </div>
                     <div className="flex items-center space-x-4">
-                      <div className="text-right">
+                      <div className="text-end">
                         <div className="mb-1">{getStatusBadge(category)}</div>
                         <div className={`text-sm transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-500"
@@ -902,17 +904,7 @@ const CategoriesManagement = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div
-            className={`relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md transition-all duration-300 ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-600 shadow-gray-900/50"
-                : "bg-white border-gray-300 shadow-gray-200/50"
-            }`}
-          >
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3
+        <Drawer onClose={() => setShowModal(false)} header={<><h3
                   className={`text-lg font-medium transition-colors duration-300 ${
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
@@ -921,31 +913,7 @@ const CategoriesManagement = () => {
                   {modalType === "edit" && "Edit Category"}
                   {modalType === "view" && "Category Details"}
                   {modalType === "delete" && "Delete Category"}
-                </h3>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className={`transition-colors duration-200 ${
-                    isDarkMode
-                      ? "text-gray-400 hover:text-gray-300"
-                      : "text-gray-400 hover:text-gray-600"
-                  }`}
-                >
-                  ×
-                </button>
-              </div>
-
-              {modalType === "delete" ? (
-                <div>
-                  <p
-                    className={`text-sm mb-4 transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-500"
-                    }`}
-                  >
-                    Are you sure you want to delete "{selectedCategory?.name}"?
-                    This action cannot be undone.
-                  </p>
-                  <div className="flex justify-end space-x-3">
-                    <button
+                </h3></>} footer={modalType === "delete" ? (<><button
                       onClick={() => setShowModal(false)}
                       className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors duration-200 ${
                         isDarkMode
@@ -960,95 +928,70 @@ const CategoriesManagement = () => {
                       className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-all duration-200 hover:scale-105"
                     >
                       Delete
+                    </button></>) : modalType === "view" ? null : (<><button
+                      type="button"
+                      onClick={() => {
+                        setShowModal(false);
+                        setFormData({
+                          name: "",
+                          description: "",
+                          parentCategory: "",
+                          icon: "default-icon",
+                          color: "#3B82F6",
+                          isActive: true,
+                          featured: false,
+                          sortOrder: 0,
+                        });
+                      }}
+                      className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors duration-200 ${
+                        isDarkMode
+                          ? "border-gray-600 text-gray-300 hover:bg-gray-700"
+                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Cancel
                     </button>
-                  </div>
+                    <button
+                      type="submit" form="drawer-form"
+                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
+                    >
+                      {modalType === "create" ? "Create" : "Update"} Category
+                    </button></>)}>
+            <div className="mt-3">
+              
+
+              {modalType === "delete" ? (
+                <div>
+                  <p
+                    className={`text-sm mb-4 transition-colors duration-300 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-500"
+                    }`}
+                  >
+                    Are you sure you want to delete "{selectedCategory?.name}"?
+                    This action cannot be undone.
+                  </p>
+                  
                 </div>
               ) : modalType === "view" ? (
-                <div className="space-y-3">
-                  <div>
-                    <label
-                      className={`text-sm font-medium transition-colors duration-300 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      Name
-                    </label>
-                    <p
-                      className={`text-sm transition-colors duration-300 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {selectedCategory?.name}
-                    </p>
-                  </div>
-                  <div>
-                    <label
-                      className={`text-sm font-medium transition-colors duration-300 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      Description
-                    </label>
-                    <p
-                      className={`text-sm transition-colors duration-300 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {selectedCategory?.description}
-                    </p>
-                  </div>
-                  <div>
-                    <label
-                      className={`text-sm font-medium transition-colors duration-300 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      Type
-                    </label>
-                    <p
-                      className={`text-sm transition-colors duration-300 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {selectedCategory?.parentCategory
-                        ? "Subcategory"
-                        : "Parent Category"}
-                    </p>
-                  </div>
-                  {selectedCategory?.parentCategory && (
-                    <div>
-                      <label
-                        className={`text-sm font-medium transition-colors duration-300 ${
-                          isDarkMode ? "text-gray-300" : "text-gray-700"
-                        }`}
-                      >
-                        Parent Category
-                      </label>
-                      <p
-                        className={`text-sm transition-colors duration-300 ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
-                      >
-                        {selectedCategory.parentCategory.name}
-                      </p>
-                    </div>
-                  )}
-                  <div>
-                    <label
-                      className={`text-sm font-medium transition-colors duration-300 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      Status
-                    </label>
-                    <div className="flex space-x-1 mt-1">
-                      {getStatusBadge(selectedCategory)}
-                    </div>
-                  </div>
-                </div>
+                <DetailSection cols={5}>
+                  <DetailField label="Name">{selectedCategory?.name}</DetailField>
+                  <DetailField label="Type">
+                    {selectedCategory?.parentCategory ? "Subcategory" : "Parent Category"}
+                  </DetailField>
+                  <DetailField label="Parent Category">
+                    {selectedCategory?.parentCategory?.name}
+                  </DetailField>
+                  <DetailField label="Status">{getStatusBadge(selectedCategory)}</DetailField>
+                  <DetailField label="Created At">{formatDate(selectedCategory?.createdAt, true)}</DetailField>
+                  <DetailField label="Description" wide>
+                    {selectedCategory?.description && (
+                      <span className="whitespace-pre-line font-normal">{selectedCategory.description}</span>
+                    )}
+                  </DetailField>
+                </DetailSection>
               ) : (
-                <form onSubmit={handleSubmit}>
-                  <div className="space-y-4">
+                <form id="drawer-form" onSubmit={handleSubmit}>
+                  <div className="auto-grid gap-x-4 gap-y-4">
                     <div>
                       <label
                         className={`block text-sm font-medium transition-colors duration-300 ${
@@ -1072,7 +1015,7 @@ const CategoriesManagement = () => {
                       />
                     </div>
 
-                    <div>
+                    <div className="col-span-full">
                       <label
                         className={`block text-sm font-medium transition-colors duration-300 ${
                           isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -1191,7 +1134,7 @@ const CategoriesManagement = () => {
                         />
                         <label
                           htmlFor="isActive"
-                          className={`ml-2 block text-sm transition-colors duration-300 ${
+                          className={`ms-2 block text-sm transition-colors duration-300 ${
                             isDarkMode ? "text-gray-300" : "text-gray-900"
                           }`}
                         >
@@ -1214,7 +1157,7 @@ const CategoriesManagement = () => {
                         />
                         <label
                           htmlFor="featured"
-                          className={`ml-2 block text-sm transition-colors duration-300 ${
+                          className={`ms-2 block text-sm transition-colors duration-300 ${
                             isDarkMode ? "text-gray-300" : "text-gray-900"
                           }`}
                         >
@@ -1224,42 +1167,11 @@ const CategoriesManagement = () => {
                     </div>
                   </div>
 
-                  <div className="mt-6 flex justify-end space-x-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowModal(false);
-                        setFormData({
-                          name: "",
-                          description: "",
-                          parentCategory: "",
-                          icon: "default-icon",
-                          color: "#3B82F6",
-                          isActive: true,
-                          featured: false,
-                          sortOrder: 0,
-                        });
-                      }}
-                      className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors duration-200 ${
-                        isDarkMode
-                          ? "border-gray-600 text-gray-300 hover:bg-gray-700"
-                          : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
-                    >
-                      {modalType === "create" ? "Create" : "Update"} Category
-                    </button>
-                  </div>
+                  
                 </form>
               )}
             </div>
-          </div>
-        </div>
+          </Drawer>
       )}
     </div>
   );

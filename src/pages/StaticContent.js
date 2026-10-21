@@ -23,6 +23,7 @@ import {
   DocumentDuplicateIcon,
 } from '@heroicons/react/24/outline';
 import { RowsSkeleton } from '../components/Skeleton';
+import Drawer from '../components/Drawer';
 
 const StaticContent = () => {
   const { t } = useTranslation();
@@ -259,7 +260,7 @@ const StaticContent = () => {
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
-                <GlobeAltIcon className="h-4 w-4 mr-2" />
+                <GlobeAltIcon className="h-4 w-4 me-2" />
                 English
               </button>
               <button
@@ -270,7 +271,7 @@ const StaticContent = () => {
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                 }`}
               >
-                <GlobeAltIcon className="h-4 w-4 mr-2" />
+                <GlobeAltIcon className="h-4 w-4 me-2" />
                 العربية
               </button>
             </div>
@@ -408,7 +409,7 @@ const StaticContent = () => {
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                     className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
                   />
-                  <label className={`ml-2 text-sm ${
+                  <label className={`ms-2 text-sm ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>
                     {t('staticContent.active')}
@@ -426,7 +427,7 @@ const StaticContent = () => {
                         : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
-                    <EyeIcon className="h-4 w-4 mr-2 inline" />
+                    <EyeIcon className="h-4 w-4 me-2 inline" />
                     {t('staticContent.preview')}
                   </button>
                   <button
@@ -435,9 +436,9 @@ const StaticContent = () => {
                     className="px-6 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:opacity-50 flex items-center"
                   >
                     {isLoading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
                     ) : (
-                      <CheckIcon className="h-4 w-4 mr-2" />
+                      <CheckIcon className="h-4 w-4 me-2" />
                     )}
                     {isLoading ? t('common.saving') : (isEditing ? t('common.update') : t('common.create'))}
                   </button>
@@ -449,23 +450,8 @@ const StaticContent = () => {
 
         {/* Preview Modal */}
         {showPreview && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden ${
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            }`}>
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-medium">{t('staticContent.preview')}</h3>
-                <button
-                  onClick={() => setShowPreview(false)}
-                  className={`p-2 rounded-lg transition-colors ${
-                    isDarkMode 
-                      ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <XMarkIcon className="h-5 w-5" />
-                </button>
-              </div>
+          <Drawer onClose={() => setShowPreview(false)} header={<><h3 className="text-lg font-medium">{t('staticContent.preview')}</h3></>}>
+              
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
                 <h1 className="text-2xl font-bold mb-4">{formData.title}</h1>
                 <div 
@@ -475,8 +461,7 @@ const StaticContent = () => {
                   }}
                 />
               </div>
-            </div>
-          </div>
+            </Drawer>
         )}
       </div>
     );
@@ -500,7 +485,7 @@ const StaticContent = () => {
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center">
-                    <Icon className={`h-8 w-8 mr-3 ${
+                    <Icon className={`h-8 w-8 me-3 ${
                       isDarkMode ? 'text-orange-400' : 'text-orange-600'
                     }`} />
                     <div>
@@ -532,7 +517,7 @@ const StaticContent = () => {
                     onClick={() => handleCreateNew(type.value)}
                     className="flex-1 bg-custom-btnBg hover:bg-custom-btnBg/90 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center"
                   >
-                    <PlusIcon className="h-4 w-4 mr-2" />
+                    <PlusIcon className="h-4 w-4 me-2" />
                     {existingContent ? t('staticContent.edit') : t('staticContent.create')}
                   </button>
                   {existingContent && (
@@ -578,37 +563,37 @@ const StaticContent = () => {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                     S.No.
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                       {t('staticContent.type')}
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                       {t('staticContent.title')}
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                       {t('staticContent.version')}
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                       {t('common.status')}
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                       {t('staticContent.lastUpdated')}
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`sticky-end-col px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-500'
                     }`}>
                       {t('common.actions')}
@@ -625,7 +610,7 @@ const StaticContent = () => {
 <td className="px-6 py-4 whitespace-nowrap">{index + 1}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <Icon className={`h-5 w-5 mr-3 ${
+                            <Icon className={`h-5 w-5 me-3 ${
                               isDarkMode ? 'text-orange-400' : 'text-orange-600'
                             }`} />
                             <span className={`text-sm font-medium ${
@@ -659,7 +644,7 @@ const StaticContent = () => {
                         }`}>
                           {formatDate(content.updatedAt)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="sticky-end-col px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
                             <button
                               onClick={() => handleEdit(content)}

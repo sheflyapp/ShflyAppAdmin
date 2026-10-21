@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import Pagination from '../components/Pagination';
+import Drawer from '../components/Drawer';
 
 const Payments = () => {
   const { isDarkMode } = useTheme();
@@ -64,7 +65,14 @@ const fetchPayments = async () => {
     const response = await callAPI.get('/api/admin/payments');
     
     if (response.data.success) {
-      setPayments(response.data.data.payments || []);
+      // The API returns populated seekerId / providerId / questionId; the page reads
+      // seeker / provider / consultationId, so expose both shapes.
+      setPayments((response.data.data.payments || []).map((p) => ({
+        ...p,
+        seeker: p.seeker || (typeof p.seekerId === 'object' ? p.seekerId : null),
+        provider: p.provider || (typeof p.providerId === 'object' ? p.providerId : null),
+        consultationId: p.consultationId || p.questionId?._id || (typeof p.questionId === 'string' ? p.questionId : ''),
+      })));
       setTotals(response.data.data.totals || null);
     } else {
       toast.error('Failed to fetch payments');
@@ -176,12 +184,12 @@ const fetchPayments = async () => {
     const theme = isDarkMode ? config.dark : config.light;
     
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full flex items-center transition-colors duration-300 ${
+      <span className={`px-2 py-1 text-xs font-medium rounded-full inline-flex items-center transition-colors duration-300 ${
         isDarkMode 
           ? `${theme.bg} ${theme.text} ${theme.border}` 
           : `${theme.bg} ${theme.text}`
       }`}>
-        <Icon className="h-3 w-3 mr-1" />
+        <Icon className="h-3 w-3 me-1" />
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
@@ -226,12 +234,12 @@ const fetchPayments = async () => {
     const theme = isDarkMode ? config.dark : config.light;
     
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full flex items-center transition-colors duration-300 ${
+      <span className={`px-2 py-1 text-xs font-medium rounded-full inline-flex items-center transition-colors duration-300 ${
         isDarkMode 
           ? `${theme.bg} ${theme.text} ${theme.border}` 
           : `${theme.bg} ${theme.text}`
       }`}>
-        <Icon className="h-3 w-3 mr-1" />
+        <Icon className="h-3 w-3 me-1" />
         {config.label}
       </span>
     );
@@ -298,7 +306,7 @@ const fetchPayments = async () => {
                 isDarkMode ? 'text-blue-400' : 'text-blue-600'
               }`} />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Total Revenue</p>
@@ -322,7 +330,7 @@ const fetchPayments = async () => {
                 isDarkMode ? 'text-green-400' : 'text-green-600'
               }`} />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Completed Payments</p>
@@ -346,7 +354,7 @@ const fetchPayments = async () => {
                 isDarkMode ? 'text-purple-400' : 'text-purple-600'
               }`} />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Total Fees</p>
@@ -370,7 +378,7 @@ const fetchPayments = async () => {
                 isDarkMode ? 'text-red-400' : 'text-red-600'
               }`} />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Total Refunds</p>
@@ -385,7 +393,7 @@ const fetchPayments = async () => {
       </div>
 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
 <div className="relative w-full sm:w-56">
-                <MagnifyingGlassIcon className={`h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+                <MagnifyingGlassIcon className={`h-5 w-5 absolute start-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-400' : 'text-gray-400'
                 }`} />
                 <input
@@ -393,7 +401,7 @@ const fetchPayments = async () => {
                   placeholder="Search payments..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                  className={`w-full ps-10 pe-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
                     isDarkMode 
                       ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
                       : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
@@ -449,7 +457,7 @@ const fetchPayments = async () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
                   </div>
                 </button>
                 <button
@@ -465,7 +473,7 @@ const fetchPayments = async () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
                   </div>
                 </button>
                 <button
@@ -481,7 +489,7 @@ const fetchPayments = async () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
                   </div>
                 </button>
               </div>
@@ -501,37 +509,37 @@ const fetchPayments = async () => {
               isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
             }`}>
               <tr>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
                   S.No.
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
                   Transaction
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
                   Amount
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
                   Method
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
                   Status
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
                   Date
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                <th className={`sticky-end-col px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>
                   Actions
@@ -630,7 +638,7 @@ const fetchPayments = async () => {
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="sticky-end-col px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleViewPayment(payment)}
@@ -731,7 +739,7 @@ const fetchPayments = async () => {
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      <div className="text-left sm:text-right">
+                      <div className="text-start sm:text-end">
                         <div className="mb-1">{getPaymentMethodBadge(payment.paymentMethod)}</div>
                         <div className="mb-1">{getStatusBadge(payment.status)}</div>
                         <div className={`text-sm transition-colors duration-300 ${
@@ -878,29 +886,14 @@ const fetchPayments = async () => {
 
       {/* Payment Details Modal */}
       {showPaymentModal && selectedPayment && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className={`relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md transition-all duration-300 ${
-            isDarkMode 
-              ? 'bg-gray-800 border-gray-600 shadow-gray-900/50' 
-              : 'bg-white border-gray-300 shadow-gray-200/50'
-          }`}>
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className={`text-lg font-medium transition-colors duration-300 ${
+        <Drawer onClose={() => setShowPaymentModal(false)} header={<><h3 className={`text-lg font-medium transition-colors duration-300 ${
                   isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>Payment Details</h3>
-                <button
-                  onClick={() => setShowPaymentModal(false)}
-                  className={`transition-colors duration-200 ${
-                    isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                >
-                  <XCircleIcon className="h-6 w-6" />
-                </button>
-              </div>
+                }`}>Payment Details</h3></>}>
+            <div className="mt-3">
               
-              <div className="space-y-3">
-                <div>
+              
+              <div className="auto-grid auto-grid-sm gap-x-4 gap-y-4">
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Transaction ID</label>
@@ -909,7 +902,7 @@ const fetchPayments = async () => {
                   }`}>{selectedPayment.transactionId}</p>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Consultation ID</label>
@@ -918,7 +911,7 @@ const fetchPayments = async () => {
                   }`}>{selectedPayment.consultationId}</p>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Seeker</label>
@@ -930,7 +923,7 @@ const fetchPayments = async () => {
                   }`}>{selectedPayment?.seeker?.email || '—'}</p>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Provider</label>
@@ -942,7 +935,7 @@ const fetchPayments = async () => {
                   }`}>{selectedPayment?.provider?.email || '—'}</p>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Amount</label>
@@ -953,7 +946,7 @@ const fetchPayments = async () => {
                   </p>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Payment Method</label>
@@ -962,7 +955,7 @@ const fetchPayments = async () => {
                   </div>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Status</label>
@@ -971,7 +964,7 @@ const fetchPayments = async () => {
                   </div>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Fee</label>
@@ -982,7 +975,7 @@ const fetchPayments = async () => {
                   </p>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Net Amount</label>
@@ -993,7 +986,7 @@ const fetchPayments = async () => {
                   </p>
                 </div>
                 
-                <div>
+                <div className="min-w-0 break-words">
                   <label className={`text-sm font-medium transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                   }`}>Description</label>
@@ -1002,8 +995,16 @@ const fetchPayments = async () => {
                   }`}>{selectedPayment.description}</p>
                 </div>
                 
+                <div className="min-w-0 break-words">
+                  <label className={`text-sm font-medium transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>Created</label>
+                  <p className={`text-sm transition-colors duration-300 ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}>{formatDateTime(selectedPayment.createdAt)}</p>
+                </div>
                 {selectedPayment.failureReason && (
-                  <div>
+                  <div className="min-w-0 break-words col-span-full">
                     <label className={`text-sm font-medium transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>Failure Reason</label>
@@ -1012,7 +1013,7 @@ const fetchPayments = async () => {
                 )}
                 
                 {selectedPayment.refundAmount > 0 && (
-                  <div>
+                  <div className="min-w-0 break-words">
                     <label className={`text-sm font-medium transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>Refund Amount</label>
@@ -1024,17 +1025,9 @@ const fetchPayments = async () => {
                   </div>
                 )}
                 
-                <div>
-                  <label className={`text-sm font-medium transition-colors duration-300 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                  }`}>Created</label>
-                  <p className={`text-sm transition-colors duration-300 ${
-                    isDarkMode ? 'text-white' : 'text-gray-900'
-                  }`}>{formatDateTime(selectedPayment.createdAt)}</p>
-                </div>
                 
                 {selectedPayment.completedAt && (
-                  <div>
+                  <div className="min-w-0 break-words">
                     <label className={`text-sm font-medium transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>Completed</label>
@@ -1045,7 +1038,7 @@ const fetchPayments = async () => {
                 )}
                 
                 {selectedPayment.refundedAt && (
-                  <div>
+                  <div className="min-w-0 break-words">
                     <label className={`text-sm font-medium transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-300' : 'text-gray-700'
                     }`}>Refunded</label>
@@ -1056,8 +1049,7 @@ const fetchPayments = async () => {
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </Drawer>
       )}
     </div>
   );

@@ -84,11 +84,17 @@
   "auth": {
     "loginTitle": "Admin Login",
     "loginSubtitle": "Enter your credentials to access the admin panel",
+    "welcomeBack": "Welcome back",
     "forgotPassword": "Forgot Password?",
     "rememberMe": "Remember Me",
     "invalidCredentials": "Invalid email or password",
     "loginSuccess": "Login successful",
-    "logoutSuccess": "Logout successful"
+    "logoutSuccess": "Logout successful",
+    "fillAllFields": "Please fill in all fields",
+    "loginFailed": "Login failed. Please try again.",
+    "adminOnly": "This is an admin-only portal. Regular users should use the mobile app.",
+    "heroTitle": "Run your consultation platform with confidence",
+    "heroSubtitle": "Manage providers, seekers, consultations and payments from one place."
   },
   "users": {
     "title": "User Management",

@@ -16,6 +16,10 @@ import {
 import { toast } from "react-hot-toast";
 import { ListPageSkeleton } from '../components/Skeleton';
 import Pagination from '../components/Pagination';
+import Drawer from '../components/Drawer';
+import UserEditFields from '../components/UserEditFields';
+import SpecializationTags from '../components/SpecializationTags';
+import UserDetails, { UserDetailsHeader } from '../components/UserDetails';
 
 const Users = () => {
   const { isDarkMode } = useTheme();
@@ -174,7 +178,7 @@ const Users = () => {
       if (response.data.success) {
         setUsers(
           users.map((user) =>
-          user._id === userData._id ? response.data.data : user
+          user._id === userData._id ? response.data.data.user : user
           )
         );
         setShowEditModal(false);
@@ -346,7 +350,7 @@ const Users = () => {
                 }`}
               />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p
                 className={`text-xs font-medium transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-gray-600"
@@ -384,7 +388,7 @@ const Users = () => {
                 }`}
               />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p
                 className={`text-xs font-medium transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-gray-600"
@@ -422,7 +426,7 @@ const Users = () => {
                 }`}
               />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p
                 className={`text-xs font-medium transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-gray-600"
@@ -460,7 +464,7 @@ const Users = () => {
                 }`}
               />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p
                 className={`text-xs font-medium transition-colors duration-300 ${
                   isDarkMode ? "text-gray-300" : "text-gray-600"
@@ -482,7 +486,7 @@ const Users = () => {
 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
               <div className="relative w-full sm:w-56">
                 <MagnifyingGlassIcon
-                  className={`h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+                  className={`h-5 w-5 absolute start-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                     isDarkMode ? "text-gray-400" : "text-gray-400"
                   }`}
                 />
@@ -491,7 +495,7 @@ const Users = () => {
                   placeholder="Search users..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                  className={`w-full ps-10 pe-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
                     isDarkMode 
                       ? "border-gray-600 bg-gray-700 text-white placeholder-gray-400"
                       : "border-gray-300 bg-white text-gray-900 placeholder-gray-500"
@@ -542,7 +546,7 @@ const Users = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
             </div>
                 </button>
                 <button
@@ -558,7 +562,7 @@ const Users = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
                   </div>
                 </button>
                 <button
@@ -574,7 +578,7 @@ const Users = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
                   </div>
                 </button>
               </div>
@@ -582,7 +586,7 @@ const Users = () => {
             onClick={handleAddUser}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
           >
-            <PlusIcon className="h-4 w-4 mr-2" />
+            <PlusIcon className="h-4 w-4 me-2" />
             New
           </button>
           </div>
@@ -611,49 +615,49 @@ const Users = () => {
               >
                 <tr>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-gray-500"
                     }`}
                   >
                     S.No.
                   </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-gray-500"
                     }`}
                   >
                   User
                 </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-gray-500"
                     }`}
                   >
                   Type
                 </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-gray-500"
                     }`}
                   >
                   Status
                 </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-gray-500"
                     }`}
                   >
                   Specializations
                 </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-gray-500"
                     }`}
                   >
                   Joined
                 </th>
                   <th
-                    className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                    className={`sticky-end-col px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                       isDarkMode ? "text-gray-200" : "text-gray-500"
                     }`}
                   >
@@ -715,7 +719,7 @@ const Users = () => {
                             }`}
                           />
                       </div>
-                      <div className="ml-4">
+                      <div className="ms-4">
                           <div
                             className={`text-sm font-medium transition-colors duration-300 ${
                               isDarkMode ? "text-white" : "text-gray-900"
@@ -751,9 +755,7 @@ const Users = () => {
                         isDarkMode ? "text-gray-200" : "text-gray-900"
                       }`}
                     >
-                    <div className="max-w-xs truncate" title={formatSpecializations(user.specializations)}>
-                      {formatSpecializations(user.specializations)}
-                    </div>
+                    <SpecializationTags items={user.specializations} />
                   </td>
                     <td
                       className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
@@ -762,7 +764,7 @@ const Users = () => {
                     >
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td className="sticky-end-col px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleViewUser(user)}
@@ -879,7 +881,7 @@ const Users = () => {
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      <div className="text-left sm:text-right">
+                      <div className="text-start sm:text-end">
                         <div className="mb-1">{getUserTypeBadge(user.userType)}</div>
                         <div className="mb-1">{getStatusBadge(user)}</div>
                         <div className={`text-sm transition-colors duration-300 ${
@@ -1066,384 +1068,14 @@ const Users = () => {
 
       {/* User Details Modal */}
       {showUserModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div
-            className={`relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md transition-colors duration-300 ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
-            }`}
-          >
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3
-                  className={`text-lg font-medium transition-colors duration-300 ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
-                >
-                  User Details
-                </h3>
-                <button
-                  onClick={() => setShowUserModal(false)}
-                  className={`transition-colors duration-200 ${
-                    isDarkMode
-                      ? "text-gray-400 hover:text-gray-300"
-                      : "text-gray-400 hover:text-gray-600"
-                  }`}
-                >
-                  <XCircleIcon className="h-6 w-6" />
-                </button>
-              </div>
-              
-              <div className="space-y-3">
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Full Name
-                  </label>
-                  <p
-                    className={`text-sm transition-colors duration-300 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {selectedUser.fullname}
-                  </p>
-                </div>
-                
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Username
-                  </label>
-                  <p
-                    className={`text-sm transition-colors duration-300 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    @{selectedUser.username}
-                  </p>
-                </div>
-                
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Email
-                  </label>
-                  <p
-                    className={`text-sm transition-colors duration-300 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {selectedUser.email}
-                  </p>
-                </div>
-                
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    User Type
-                  </label>
-                  <p
-                    className={`text-sm transition-colors duration-300 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {selectedUser.userType}
-                  </p>
-                </div>
-                
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Gender
-                  </label>
-                  <p
-                    className={`text-sm transition-colors duration-300 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {selectedUser.gender}
-                  </p>
-                </div>
-                
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Specializations
-                  </label>
-                  <p
-                    className={`text-sm transition-colors duration-300 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {formatSpecializations(selectedUser.specializations)}
-                  </p>
-                </div>
-                
-                {selectedUser.specialization && (
-                  <div>
-                    <label
-                      className={`text-sm font-medium transition-colors duration-300 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      Specialization
-                    </label>
-                    <p
-                      className={`text-sm transition-colors duration-300 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {selectedUser.specialization}
-                    </p>
-                  </div>
-                )}
-                
-                {selectedUser.price && (
-                  <div>
-                    <label
-                      className={`text-sm font-medium transition-colors duration-300 ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      Price
-                    </label>
-                    <p
-                      className={`text-sm transition-colors duration-300 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      ${selectedUser.price}/hour
-                    </p>
-                  </div>
-                )}
-                
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Status
-                  </label>
-                  <div className="flex space-x-2 mt-1">
-                    {getStatusBadge(selectedUser)}
-                    {getUserTypeBadge(selectedUser.userType)}
-                  </div>
-                </div>
-                
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Joined
-                  </label>
-                  <p
-                    className={`text-sm transition-colors duration-300 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {new Date(selectedUser.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                
-                <div>
-                  <label
-                    className={`text-sm font-medium transition-colors duration-300 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    Last Login
-                  </label>
-                  <p
-                    className={`text-sm transition-colors duration-300 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {new Date(selectedUser.lastLogin).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Drawer onClose={() => setShowUserModal(false)} header={<UserDetailsHeader user={selectedUser} />}>
+          <UserDetails user={selectedUser} />
+        </Drawer>
       )}
 
       {/* Edit User Modal */}
       {showEditModal && editingUser && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Edit User</h3>
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XCircleIcon className="h-6 w-6" />
-                </button>
-              </div>
-              
-              <form
-                onSubmit={(e) => {
-                e.preventDefault();
-                handleUpdateUser(editingUser);
-                }}
-              >
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      value={editingUser.fullname}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          fullname: e.target.value,
-                        })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Username
-                    </label>
-                    <input
-                      type="text"
-                      value={editingUser.username}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          username: e.target.value,
-                        })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={editingUser.email}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          email: e.target.value,
-                        })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      User Type
-                    </label>
-                    <select
-                      value={editingUser.userType}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          userType: e.target.value,
-                        })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    >
-                      <option value="seeker">Seeker</option>
-                      <option value="provider">Provider</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      Country
-                    </label>
-                    <input
-                      type="text"
-                      value={editingUser.country}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          country: e.target.value,
-                        })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="isVerified"
-                      checked={editingUser.isVerified}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          isVerified: e.target.checked,
-                        })
-                      }
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label
-                      htmlFor="isVerified"
-                      className="ml-2 block text-sm text-gray-900"
-                    >
-                      Verified User
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="isActive"
-                      checked={editingUser.isActive}
-                      onChange={(e) =>
-                        setEditingUser({
-                          ...editingUser,
-                          isActive: e.target.checked,
-                        })
-                      }
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label
-                      htmlFor="isActive"
-                      className="ml-2 block text-sm text-gray-900"
-                    >
-                      Active User
-                    </label>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
+        <Drawer onClose={() => setShowEditModal(false)} header={<><h3 className="text-lg font-medium text-gray-900">Edit User</h3></>} footer={<><button
                     type="button"
                     onClick={() => setShowEditModal(false)}
                     className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -1451,42 +1083,74 @@ const Users = () => {
                     Cancel
                   </button>
                   <button
-                    type="submit"
+                    type="submit" form="drawer-form"
                     className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90"
                   >
                     Update User
-                  </button>
+                  </button></>}>
+            <div className="mt-3">
+              
+              
+              <form id="drawer-form"
+                onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateUser(editingUser);
+                }}
+              >
+                <div className="auto-grid gap-x-4 gap-y-4">
+                  <UserEditFields value={editingUser} onChange={(patch) => setEditingUser({ ...editingUser, ...patch })} showUserType />
                 </div>
+                
+                
               </form>
             </div>
-          </div>
-        </div>
+          </Drawer>
       )}
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+        <Drawer onClose={() => setShowAddModal(false)} header={<><h3 className="text-lg font-medium text-gray-900">
                   Add New User
-                </h3>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </div>
+                </h3></>} footer={<><button
+                    type="button"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setNewUser({
+                        fullname: "",
+                        username: "",
+                        email: "",
+                        password: "",
+                        userType: "seeker",
+                        phone: "",
+                        country: "",
+                        gender: "other",
+                        dob: "1990-01-01",
+                        specialization: "",
+                        price: 0,
+                        isVerified: false,
+                        isActive: true,
+                      });
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit" form="drawer-form"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90"
+                  >
+                    Create User
+                  </button></>}>
+            <div className="mt-3">
               
-              <form
+              
+              <form id="drawer-form"
                 onSubmit={(e) => {
                 e.preventDefault();
                 handleCreateUser(newUser);
                 }}
               >
-                <div className="space-y-4">
+                <div className="auto-grid gap-x-4 gap-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Full Name
@@ -1672,7 +1336,7 @@ const Users = () => {
                     />
                     <label
                       htmlFor="isVerified"
-                      className="ml-2 block text-sm text-gray-900"
+                      className="ms-2 block text-sm text-gray-900"
                     >
                       Verified User
                     </label>
@@ -1690,49 +1354,17 @@ const Users = () => {
                     />
                     <label
                       htmlFor="isActive"
-                      className="ml-2 block text-sm text-gray-900"
+                      className="ms-2 block text-sm text-gray-900"
                     >
                       Active User
                     </label>
                   </div>
                 </div>
                 
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAddModal(false);
-                      setNewUser({
-                        fullname: "",
-                        username: "",
-                        email: "",
-                        password: "",
-                        userType: "seeker",
-                        phone: "",
-                        country: "",
-                        gender: "other",
-                        dob: "1990-01-01",
-                        specialization: "",
-                        price: 0,
-                        isVerified: false,
-                        isActive: true,
-                      });
-                    }}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90"
-                  >
-                    Create User
-                  </button>
-                </div>
+                
               </form>
             </div>
-          </div>
-        </div>
+          </Drawer>
       )}
 
     </div>

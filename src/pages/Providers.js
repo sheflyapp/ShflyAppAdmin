@@ -18,6 +18,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import Pagination from '../components/Pagination';
+import Drawer from '../components/Drawer';
+import UserEditFields from '../components/UserEditFields';
+import SpecializationTags from '../components/SpecializationTags';
+import UserDetails, { UserDetailsHeader } from '../components/UserDetails';
 
 const Providers = () => {
   const { isDarkMode } = useTheme();
@@ -202,7 +206,7 @@ const Providers = () => {
       
       if (response.data.success) {
         setProviders(providers.map(provider => 
-          provider._id === providerData._id ? response.data.data : provider
+          provider._id === providerData._id ? response.data.data.user : provider
         ));
         setShowEditModal(false);
         setEditingProvider(null);
@@ -372,7 +376,7 @@ const Providers = () => {
                 isDarkMode ? 'text-purple-400' : 'text-purple-600'
               }`} />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Total</p>
@@ -394,7 +398,7 @@ const Providers = () => {
                 isDarkMode ? 'text-green-400' : 'text-green-600'
               }`} />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Verified</p>
@@ -418,7 +422,7 @@ const Providers = () => {
                 isDarkMode ? 'text-blue-400' : 'text-blue-600'
               }`} />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Avg Rating</p>
@@ -445,7 +449,7 @@ const Providers = () => {
                 isDarkMode ? 'text-green-400' : 'text-green-600'
               }`} />
             </div>
-            <div className="ml-3">
+            <div className="ms-3">
               <p className={`text-xs font-medium transition-colors duration-300 ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
               }`}>Avg Price</p>
@@ -463,7 +467,7 @@ const Providers = () => {
       </div>
 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
               <div className="relative w-full sm:w-56">
-                <MagnifyingGlassIcon className={`h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
+                <MagnifyingGlassIcon className={`h-5 w-5 absolute start-3 top-1/2 transform -translate-y-1/2 transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-400' : 'text-gray-400'
                 }`} />
                 <input
@@ -471,7 +475,7 @@ const Providers = () => {
                   placeholder="Search providers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
+                  className={`w-full ps-10 pe-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-300 ${
                     isDarkMode 
                       ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400' 
                       : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
@@ -522,7 +526,7 @@ const Providers = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
                   </div>
                 </button>
                 <button
@@ -538,7 +542,7 @@ const Providers = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
                   </div>
                 </button>
                 <button
@@ -554,7 +558,7 @@ const Providers = () => {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
+                    <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
                   </div>
                 </button>
               </div>
@@ -562,7 +566,7 @@ const Providers = () => {
             onClick={handleAddProvider}
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90 transition-all duration-200 hover:scale-105"
           >
-            <PlusIcon className="h-4 w-4 mr-2" />
+            <PlusIcon className="h-4 w-4 me-2" />
             New
           </button>
           </div>
@@ -582,37 +586,37 @@ const Providers = () => {
                 isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
               }`}>
                 <tr>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
                     S.No.
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
                     Provider
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
                     Specialization
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
                     Rating
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
                     Price
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
                     Status
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  <th className={`sticky-end-col px-6 py-3 text-start text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-200' : 'text-gray-500'
                   }`}>
                     Actions
@@ -662,7 +666,7 @@ const Providers = () => {
                             isDarkMode ? 'text-white' : 'text-purple-600'
                           }`} />
                         </div>
-                        <div className="ml-4">
+                        <div className="ms-4">
                           <div className={`text-sm font-medium transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>{provider.fullname}</div>
@@ -676,17 +680,11 @@ const Providers = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                    {provider?.specializations?.map((item, index) => (
-                      <span key={index} className={`px-2 py-1 text-xs font-medium rounded-full transition-colors duration-300 ${
-                        isDarkMode ? 'bg-blue-900/30 text-blue-200' : 'bg-blue-100 text-blue-800'
-                      }`}>
-                      {item.name}
-                      </span>
-                      ))}
+                      <SpecializationTags items={provider?.specializations} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex items-center mr-2">
+                        <div className="flex items-center me-2">
                           {getRatingStars(provider.rating)}
                         </div>
                         <span className={`text-sm transition-colors duration-300 ${
@@ -694,7 +692,7 @@ const Providers = () => {
                         }`}>{provider.rating}</span>
                         <span className={`text-xs transition-colors duration-300 ${
                           isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                        } ml-1`}>({provider.totalReviews})</span>
+                        } ms-1`}>({provider.totalReviews})</span>
                       </div>
                     </td>
                     <td className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
@@ -703,14 +701,14 @@ const Providers = () => {
                       <div className="flex items-center">
                         <CurrencyDollarIcon className={`h-4 w-4 transition-colors duration-300 ${
                           isDarkMode ? 'text-green-400' : 'text-green-600'
-                        } mr-1`} />
+                        } me-1`} />
                         {provider.price}/hour
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(provider)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="sticky-end-col px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleViewProvider(provider)}
@@ -830,7 +828,7 @@ const Providers = () => {
                       </div>
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      <div className="text-left sm:text-right">
+                      <div className="text-start sm:text-end">
                         <div className="mb-1">{getUserTypeBadge(provider.userType)}</div>
                         <div className="mb-1">{getStatusBadge(provider)}</div>
                         <div className={`text-sm transition-colors duration-300 ${
@@ -1000,219 +998,14 @@ const Providers = () => {
 
       {/* Provider Details Modal */}
       {showProviderModal && selectedProvider && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Provider Details</h3>
-                <button
-                  onClick={() => setShowProviderModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XCircleIcon className="h-6 w-6" />
-                </button>
-              </div>
-              
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Full Name</label>
-                  <p className="text-sm text-gray-900">{selectedProvider.fullname}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Username</label>
-                  <p className="text-sm text-gray-900">@{selectedProvider.username}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Email</label>
-                  <p className="text-sm text-gray-900">{selectedProvider.email}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Specialization</label>
-                  <p className="text-sm text-gray-900">{selectedProvider.specialization}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Price</label>
-                  <p className="text-sm text-gray-900">${selectedProvider.price}/hour</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Rating</label>
-                  <div className="flex items-center mt-1">
-                    {getRatingStars(selectedProvider.rating)}
-                    <span className="ml-2 text-sm text-gray-900">{selectedProvider.rating}</span>
-                    <span className="text-xs text-gray-500 ml-1">({selectedProvider.totalReviews} reviews)</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Total Consultations</label>
-                  <p className="text-sm text-gray-900">{selectedProvider.totalConsultations}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Specializations</label>
-                  <p className="text-sm text-gray-900">{formatSpecializations(selectedProvider.specializations)}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Bio</label>
-                  <p className="text-sm text-gray-900">{selectedProvider.bio}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Availability</label>
-                  <div className="flex space-x-2 mt-1">
-                    {selectedProvider.availability.chat && (
-                      <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Chat</span>
-                    )}
-                    {selectedProvider.availability.call && (
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Call</span>
-                    )}
-                    {selectedProvider.availability.video && (
-                      <span className="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">Video</span>
-                    )}
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Status</label>
-                  <div className="flex space-x-2 mt-1">
-                    {getStatusBadge(selectedProvider)}
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Joined</label>
-                  <p className="text-sm text-gray-900">
-                    {new Date(selectedProvider.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Last Login</label>
-                  <p className="text-sm text-gray-900">
-                    {new Date(selectedProvider.lastLogin).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Drawer onClose={() => setShowProviderModal(false)} header={<UserDetailsHeader user={selectedProvider} />}>
+          <UserDetails user={selectedProvider} />
+        </Drawer>
       )}
 
       {/* Edit Provider Modal */}
       {showEditModal && editingProvider && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Edit Provider</h3>
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </div>
-              
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                handleUpdateProvider(editingProvider);
-              }}>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input
-                      type="text"
-                      value={editingProvider.fullname}
-                      onChange={(e) => setEditingProvider({...editingProvider, fullname: e.target.value})}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Username</label>
-                    <input
-                      type="text"
-                      value={editingProvider.username}
-                      onChange={(e) => setEditingProvider({...editingProvider, username: e.target.value})}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
-                    <input
-                      type="email"
-                      value={editingProvider.email}
-                      onChange={(e) => setEditingProvider({...editingProvider, email: e.target.value})}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Specialization</label>
-                    <input
-                      type="text"
-                      value={editingProvider.specialization || ''}
-                      onChange={(e) => setEditingProvider({...editingProvider, specialization: e.target.value})}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Price</label>
-                    <input
-                      type="number"
-                      value={editingProvider.price || 0}
-                      onChange={(e) => setEditingProvider({...editingProvider, price: parseFloat(e.target.value)})}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Country</label>
-                    <input
-                      type="text"
-                      value={editingProvider.country || ''}
-                      onChange={(e) => setEditingProvider({...editingProvider, country: e.target.value})}
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="isVerified"
-                      checked={editingProvider.isVerified}
-                      onChange={(e) => setEditingProvider({...editingProvider, isVerified: e.target.checked})}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="isVerified" className="ml-2 block text-sm text-gray-900">
-                      Verified Provider
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="isActive"
-                      checked={editingProvider.isActive}
-                      onChange={(e) => setEditingProvider({...editingProvider, isActive: e.target.checked})}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
-                      Active Provider
-                    </label>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
+        <Drawer onClose={() => setShowEditModal(false)} header={<><h3 className="text-lg font-medium text-gray-900">Edit Provider</h3></>} footer={<><button
                     type="button"
                     onClick={() => setShowEditModal(false)}
                     className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -1220,38 +1013,69 @@ const Providers = () => {
                     Cancel
                   </button>
                   <button
-                    type="submit"
+                    type="submit" form="drawer-form"
                     className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90"
                   >
                     Update Provider
-                  </button>
+                  </button></>}>
+            <div className="mt-3">
+              
+              
+              <form id="drawer-form" onSubmit={(e) => {
+                e.preventDefault();
+                handleUpdateProvider(editingProvider);
+              }}>
+                <div className="auto-grid gap-x-4 gap-y-4">
+                  <UserEditFields value={editingProvider} onChange={(patch) => setEditingProvider({ ...editingProvider, ...patch })} />
                 </div>
+                
+                
               </form>
             </div>
-          </div>
-        </div>
+          </Drawer>
       )}
 
       {/* Add Provider Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <Drawer onClose={() => setShowAddModal(false)} header={<><h3 className="text-lg font-medium text-gray-900">Add New Provider</h3></>} footer={<><button
+                    type="button"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setNewProvider({
+                        fullname: '',
+                        username: '',
+                        email: '',
+                        password: '',
+                        userType: 'provider',
+                        phone: '',
+                        specialization: '',
+                        price: 0,
+                        country: '',
+                        gender: 'other',
+                        dob: '1990-01-01',
+                        bio: '',
+                        isVerified: false,
+                        isActive: true
+                      });
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit" form="drawer-form"
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90"
+                  >
+                    Create Provider
+                  </button></>}>
             <div className="mt-3">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Add New Provider</h3>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </div>
               
-              <form onSubmit={(e) => {
+              
+              <form id="drawer-form" onSubmit={(e) => {
                 e.preventDefault();
                 handleCreateProvider(newProvider);
               }}>
-                <div className="space-y-4">
+                <div className="auto-grid gap-x-4 gap-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Full Name</label>
                     <input
@@ -1363,7 +1187,7 @@ const Providers = () => {
                     />
                   </div>
                   
-                  <div>
+                  <div className="col-span-full">
                     <label className="block text-sm font-medium text-gray-700">Bio</label>
                     <textarea
                       rows={3}
@@ -1382,7 +1206,7 @@ const Providers = () => {
                       onChange={(e) => setNewProvider({...newProvider, isVerified: e.target.checked})}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="isVerified" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="isVerified" className="ms-2 block text-sm text-gray-900">
                       Verified Provider
                     </label>
                   </div>
@@ -1395,49 +1219,16 @@ const Providers = () => {
                       onChange={(e) => setNewProvider({...newProvider, isActive: e.target.checked})}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="isActive" className="ms-2 block text-sm text-gray-900">
                       Active Provider
                     </label>
                   </div>
                 </div>
                 
-                <div className="mt-6 flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowAddModal(false);
-                      setNewProvider({
-                        fullname: '',
-                        username: '',
-                        email: '',
-                        password: '',
-                        userType: 'provider',
-                        phone: '',
-                        specialization: '',
-                        price: 0,
-                        country: '',
-                        gender: 'other',
-                        dob: '1990-01-01',
-                        bio: '',
-                        isVerified: false,
-                        isActive: true
-                      });
-                    }}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-custom-btnBg hover:bg-custom-btnBg/90"
-                  >
-                    Create Provider
-                  </button>
-                </div>
+                
               </form>
             </div>
-          </div>
-        </div>
+          </Drawer>
       )}
 
     </div>

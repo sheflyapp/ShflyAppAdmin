@@ -10,23 +10,34 @@ export const useTheme = () => {
   return context;
 };
 
-export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
+// Saved choice wins; otherwise follow the OS preference
+const getInitialDark = () => {
+  try {
     const savedTheme = localStorage.getItem('adminTheme');
-    return savedTheme ? savedTheme === 'dark' : false;
-  });
+    if (savedTheme) return savedTheme === 'dark';
+  } catch (e) {
+    /* storage unavailable */
+  }
+  return !!window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+};
+
+export const ThemeProvider = ({ children }) => {
+  const [isDarkMode, setIsDarkMode] = useState(getInitialDark);
 
   useEffect(() => {
-    localStorage.setItem('adminTheme', isDarkMode ? 'dark' : 'light');
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    try {
+      localStorage.setItem('adminTheme', isDarkMode ? 'dark' : 'light');
+    } catch (e) {
+      /* storage unavailable */
     }
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', isDarkMode ? '#121214' : '#faf7f6');
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+    setIsDarkMode((prev) => !prev);
   };
 
   const value = {

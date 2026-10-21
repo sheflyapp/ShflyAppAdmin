@@ -6,7 +6,6 @@ import {
   EyeIcon, 
   TrashIcon,
   CheckCircleIcon,
-  XCircleIcon,
   UserIcon,
   ChatBubbleLeftRightIcon,
   ExclamationTriangleIcon,
@@ -15,6 +14,8 @@ import {
 import { toast } from "react-hot-toast";
 import { TableSkeleton } from '../components/Skeleton';
 import Pagination from '../components/Pagination';
+import Drawer from '../components/Drawer';
+import AttachmentList from '../components/AttachmentList';
 
 const Questions = () => {
   const { isDarkMode } = useTheme();
@@ -202,13 +203,13 @@ const Questions = () => {
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
 <div className="relative w-full sm:w-56">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute start-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search questions..."
                 value={searchTerm}
                 onChange={handleSearch}
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
+                className={`w-full ps-10 pe-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                     : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
@@ -279,42 +280,42 @@ const Questions = () => {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className={`sticky top-0 z-10 ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                   <tr>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                     S.No.
                   </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                  <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                       Question
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                       User
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                       Category
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                       Status
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                       Priority
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                       Created
                     </th>
-                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                    <th className={`sticky-end-col px-6 py-3 text-start text-xs font-medium uppercase tracking-wider ${
                       isDarkMode ? "text-gray-300" : "text-gray-500"
                     }`}>
                       Actions
@@ -330,7 +331,7 @@ const Questions = () => {
                           <div className="flex-shrink-0">
                             <ChatBubbleLeftRightIcon className="h-5 w-5 text-gray-400" />
                           </div>
-                          <div className="ml-3">
+                          <div className="ms-3">
                             <div className={`text-sm font-medium ${
                               isDarkMode ? "text-white" : "text-gray-900"
                             }`}>
@@ -343,7 +344,7 @@ const Questions = () => {
                                     key={index}
                                     className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
                                   >
-                                    <TagIcon className="h-3 w-3 mr-1" />
+                                    <TagIcon className="h-3 w-3 me-1" />
                                     {tag}
                                   </span>
                                 ))}
@@ -359,7 +360,7 @@ const Questions = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <UserIcon className="h-5 w-5 text-gray-400 mr-2" />
+                          <UserIcon className="h-5 w-5 text-gray-400 me-2" />
                           <div>
                             <div className={`text-sm font-medium ${
                               isDarkMode ? "text-white" : "text-gray-900"
@@ -405,7 +406,7 @@ const Questions = () => {
                           {formatDate(question.createdAt)}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="sticky-end-col px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => handleViewQuestion(question)}
@@ -470,26 +471,40 @@ const Questions = () => {
 
         {/* Question Details Modal */}
         {showQuestionModal && selectedQuestion && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-lg shadow-xl ${
-              isDarkMode ? "bg-gray-800" : "bg-white"
-            }`}>
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+          <Drawer onClose={() => setShowQuestionModal(false)} header={<><h3 className={`text-xl font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
                     Question Details
-                  </h3>
+                  </h3></>} footer={<>{selectedQuestion.status !== "closed" && (
+                    <button
+                      onClick={() => {
+                        handleCloseQuestion(selectedQuestion._id);
+                        setShowQuestionModal(false);
+                      }}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Close Question
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      handleDeleteQuestion(selectedQuestion._id);
+                      setShowQuestionModal(false);
+                    }}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Delete Question
+                  </button>
                   <button
                     onClick={() => setShowQuestionModal(false)}
-                    className={`p-2 rounded-lg transition-colors ${
+                    className={`px-4 py-2 rounded-lg transition-colors ${
                       isDarkMode
-                        ? "text-gray-400 hover:bg-gray-700"
-                        : "text-gray-500 hover:bg-gray-100"
+                        ? "bg-gray-700 text-white hover:bg-gray-600"
+                        : "bg-gray-200 text-gray-900 hover:bg-gray-300"
                     }`}
                   >
-                    <XCircleIcon className="h-6 w-6" />
-                  </button>
-                </div>
+                    Close
+                  </button></>}>
+              <div className="p-6">
+                
 
                 <div className="space-y-6">
                   {/* Question Content */}
@@ -508,7 +523,7 @@ const Questions = () => {
                       User Information
                     </h4>
                     <div className={`p-4 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="auto-grid auto-grid-sm gap-4">
                         <div>
                           <span className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                             Name:
@@ -535,7 +550,7 @@ const Questions = () => {
                       Category Information
                     </h4>
                     <div className={`p-4 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="auto-grid auto-grid-sm gap-4">
                         <div>
                           <span className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                             Category:
@@ -562,7 +577,7 @@ const Questions = () => {
                       Question Details
                     </h4>
                     <div className={`p-4 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="auto-grid auto-grid-sm gap-4">
                         <div>
                           <span className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                             Status:
@@ -607,7 +622,7 @@ const Questions = () => {
                             key={index}
                             className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
                           >
-                            <TagIcon className="h-4 w-4 mr-1" />
+                            <TagIcon className="h-4 w-4 me-1" />
                             {tag}
                           </span>
                         ))}
@@ -621,60 +636,15 @@ const Questions = () => {
                       <h4 className={`text-lg font-medium mb-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
                         Attachments
                       </h4>
-                      <div className="space-y-2">
-                        {selectedQuestion.attachments.map((attachment, index) => (
-                          <div key={index} className={`p-3 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
-                            <a
-                              href={attachment.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`text-sm ${isDarkMode ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
-                            >
-                              {attachment.description || `Attachment ${index + 1}`}
-                            </a>
-                          </div>
-                        ))}
-                      </div>
+                      <AttachmentList attachments={selectedQuestion.attachments} />
                     </div>
                   )}
                 </div>
 
                 {/* Actions */}
-                <div className="mt-6 flex justify-end space-x-3">
-                  {selectedQuestion.status !== "closed" && (
-                    <button
-                      onClick={() => {
-                        handleCloseQuestion(selectedQuestion._id);
-                        setShowQuestionModal(false);
-                      }}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Close Question
-                    </button>
-                  )}
-                  <button
-                    onClick={() => {
-                      handleDeleteQuestion(selectedQuestion._id);
-                      setShowQuestionModal(false);
-                    }}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                  >
-                    Delete Question
-                  </button>
-                  <button
-                    onClick={() => setShowQuestionModal(false)}
-                    className={`px-4 py-2 rounded-lg transition-colors ${
-                      isDarkMode
-                        ? "bg-gray-700 text-white hover:bg-gray-600"
-                        : "bg-gray-200 text-gray-900 hover:bg-gray-300"
-                    }`}
-                  >
-                    Close
-                  </button>
-                </div>
+                
               </div>
-            </div>
-          </div>
+            </Drawer>
         )}
       </div>
     </div>

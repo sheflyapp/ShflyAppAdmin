@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const token = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -7,6 +9,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Semantic tokens: values switch with the light/dark theme (see index.css)
+        app: token('app'),
+        surface: token('surface'),
+        'surface-2': token('surface-2'),
+        line: token('line'),
+        fg: token('fg'),
+        muted: token('muted'),
+        brand: {
+          DEFAULT: token('brand'),
+          soft: token('brand-soft'),
+          fg: token('brand-fg'),
+        },
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',
@@ -38,11 +52,22 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+        sans: ['Inter', 'IBM Plex Sans Arabic', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        arabic: ['IBM Plex Sans Arabic', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        xl: '0.875rem',
+        '2xl': '1.125rem',
+      },
+      boxShadow: {
+        soft: '0 1px 2px rgb(var(--shadow) / 0.06), 0 4px 16px rgb(var(--shadow) / 0.06)',
+        lift: '0 4px 12px rgb(var(--shadow) / 0.10), 0 12px 32px rgb(var(--shadow) / 0.10)',
+        glow: '0 8px 24px rgb(var(--brand) / 0.35)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.3s ease-out',
+        'pop-in': 'popIn 0.18s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -53,10 +78,12 @@ module.exports = {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
+        popIn: {
+          '0%': { transform: 'translateY(-4px) scale(0.98)', opacity: '0' },
+          '100%': { transform: 'translateY(0) scale(1)', opacity: '1' },
+        },
       },
     },
   },
   plugins: [],
 }
-
-

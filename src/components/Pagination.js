@@ -51,7 +51,7 @@ const Pagination = ({ currentPage, totalPages, totalItems, pageSize = 10, onPage
         <button
           onClick={() => onPageChange(Math.min(pages, currentPage + 1))}
           disabled={currentPage === pages}
-          className={`ml-3 ${mobileButton}`}
+          className={`ms-3 ${mobileButton}`}
         >
           Next
         </button>
@@ -67,7 +67,7 @@ const Pagination = ({ currentPage, totalPages, totalItems, pageSize = 10, onPage
           <button
             onClick={() => onPageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            className={`rounded-l-md ${edgeButton}`}
+            className={`rounded-s-md ${edgeButton}`}
           >
             Previous
           </button>
@@ -104,7 +104,7 @@ const Pagination = ({ currentPage, totalPages, totalItems, pageSize = 10, onPage
           <button
             onClick={() => onPageChange(Math.min(pages, currentPage + 1))}
             disabled={currentPage === pages}
-            className={`rounded-r-md ${edgeButton}`}
+            className={`rounded-e-md ${edgeButton}`}
           >
             Next
           </button>

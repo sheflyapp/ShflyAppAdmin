@@ -239,7 +239,7 @@ const Dashboard = () => {
               <div className={`flex-shrink-0 p-2 rounded-md ${stat.color}`}>
                 <stat.icon className="h-5 w-5 text-white" />
               </div>
-              <div className="ml-3 w-0 flex-1">
+              <div className="ms-3 w-0 flex-1">
                 <dl>
                   <dt className={`text-sm font-medium truncate transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-500'
@@ -261,12 +261,12 @@ const Dashboard = () => {
                 ) : (
                   <ArrowTrendingDownIcon className="h-4 w-4 text-red-400" />
                 )}
-                <span className={`ml-1 font-medium ${
+                <span className={`ms-1 font-medium ${
                   stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
                 }`}>
                   {stat.change}
                 </span>
-                <span className={`ml-1 transition-colors duration-300 ${
+                <span className={`ms-1 transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 }`}>from last month</span>
               </div>
@@ -357,7 +357,7 @@ const Dashboard = () => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3zm0 6h18M3 12h18M3 18h18M9 3v18M15 3v18" />
                 </svg>
-                <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
+                <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Table View</span>
               </div>
             </button>
             <button
@@ -373,7 +373,7 @@ const Dashboard = () => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                 </svg>
-                <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
+                <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">List View</span>
               </div>
             </button>
             <button
@@ -389,7 +389,7 @@ const Dashboard = () => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
-                <span className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
+                <span className="pointer-events-none absolute start-1/2 top-full z-30 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg ring-1 ring-gray-700 transition-opacity duration-150 group-hover:opacity-100">Grid View</span>
               </div>
             </button>
           </div>
@@ -453,7 +453,7 @@ const Dashboard = () => {
                             {q.postedBy?.fullname?.charAt(0) || '?'}
                           </span>
                         </div>
-                        <div className="ml-3">
+                        <div className="ms-3">
                           <div className={`text-sm font-medium transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>
@@ -475,7 +475,7 @@ const Dashboard = () => {
                             {q.solvedBy?.fullname?.charAt(0) || '?'}
                           </span>
                         </div>
-                        <div className="ml-3">
+                        <div className="ms-3">
                           <div className={`text-sm font-medium transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>
@@ -587,7 +587,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-left lg:text-right">
+                    <div className="text-start lg:text-end">
                       <div className="mb-1">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full transition-colors duration-300 ${
                           q.status === 'answered' ? 
